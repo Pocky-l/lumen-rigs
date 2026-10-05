@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "lumen_rigs:block/floodlight"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "lumen_rigs:item/lighting_remote"
+  }
+}

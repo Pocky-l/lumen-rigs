@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=up": {
+      "model": "lumen_rigs:block/soft_panel"
+    },
+    "facing=down": {
+      "model": "lumen_rigs:block/soft_panel",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "lumen_rigs:block/soft_panel",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "lumen_rigs:block/soft_panel",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "lumen_rigs:block/soft_panel",
+      "x": 90,
+      "y": 90
+    },
+    "facing=west": {
+      "model": "lumen_rigs:block/soft_panel",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

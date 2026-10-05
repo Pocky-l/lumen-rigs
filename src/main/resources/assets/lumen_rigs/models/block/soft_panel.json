@@ -1,0 +1,111 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "housing": "lumen_rigs:block/housing",
+    "metal": "lumen_rigs:block/metal",
+    "lens": "lumen_rigs:block/lens",
+    "fins": "lumen_rigs:block/fins",
+    "bezel": "lumen_rigs:block/bezel",
+    "led": "lumen_rigs:block/led",
+    "particle": "lumen_rigs:block/housing"
+  },
+  "elements": [
+    {
+      "from": [
+        1,
+        0,
+        1
+      ],
+      "to": [
+        15,
+        1.5,
+        15
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.0,
+            7.25,
+            15.0,
+            8.75
+          ],
+          "texture": "#housing"
+        },
+        "south": {
+          "uv": [
+            1.0,
+            7.25,
+            15.0,
+            8.75
+          ],
+          "texture": "#housing"
+        },
+        "east": {
+          "uv": [
+            1.0,
+            7.25,
+            15.0,
+            8.75
+          ],
+          "texture": "#housing"
+        },
+        "west": {
+          "uv": [
+            1.0,
+            7.25,
+            15.0,
+            8.75
+          ],
+          "texture": "#housing"
+        },
+        "up": {
+          "uv": [
+            1.0,
+            1.0,
+            15.0,
+            15.0
+          ],
+          "texture": "#housing"
+        },
+        "down": {
+          "uv": [
+            1.0,
+            1.0,
+            15.0,
+            15.0
+          ],
+          "texture": "#housing"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        1.5,
+        2
+      ],
+      "to": [
+        14,
+        1.6,
+        14
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            2.0,
+            2.0,
+            14.0,
+            14.0
+          ],
+          "texture": "#lens",
+          "tintindex": 0
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      },
+      "shade": false
+    }
+  ]
+}
