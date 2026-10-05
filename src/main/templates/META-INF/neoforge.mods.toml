@@ -26,5 +26,13 @@ description='''${mod_description}'''
     ordering="NONE"
     side="BOTH"
 
+# Optional: per-pixel lights, shadows and volumetric beams.
+[[dependencies.${mod_id}]]
+    modId="veil"
+    type="optional"
+    versionRange="[4.5,)"
+    ordering="NONE"
+    side="CLIENT"
+
 [[mixins]]
 config="${mod_id}.mixins.json"

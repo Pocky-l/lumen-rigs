@@ -11,6 +11,7 @@
 <p align="center">
   <img alt="Minecraft 1.21.1" src="https://img.shields.io/badge/Minecraft-1.21.1-62B47A">
   <a href="https://neoforged.net"><img alt="NeoForge" src="https://img.shields.io/badge/Loader-NeoForge-F16436"></a>
+  <a href="https://www.curseforge.com/minecraft/mc-mods/veil-lib"><img alt="Works with Veil" src="https://img.shields.io/badge/Works%20with-Veil-8A5CF6"></a>
   <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-blue">
 </p>
 
@@ -22,11 +23,15 @@
   - **Searchlight** — a long tight beam of 2–15° that reaches 64 blocks; sweep the night sky with it.
   - **Soft Light Panel** — a flat panel that softly lights everything in front of it.
 - **Mount anywhere** — floor, walls or ceiling; the fixture hangs or stands the right way.
-- **Real directional light** — the beam lights exactly the spot it points at, fading towards the edge of the cone and
-  with distance; walls cast shadows. It also lights up mobs and players standing in it.
+- **Realistic light with [Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib)** (optional, recommended) —
+  per-pixel spot and area lights like in a 3D renderer: a smooth round cone with a soft edge, light that falls off
+  with distance and shades every surface by its angle, block shadows, and beams that scatter in the air.
+- **Without Veil** — the mod's own directional light: the beam lights the spot it points at, fading towards the edge
+  and with distance, walls cast shadows, and mobs and players standing in it are lit too.
 - **Any color** — 16 dye colors, a hue slider or warm white. Colored light tints what it hits, and colors mix like
   light: red and green make yellow.
-- **Visible beams** — a cone of lit air, strongest in the dark, plus a lens flare when a fixture points at you.
+- **Visible beams** — a cone of lit air (volumetric with Veil), strongest in the dark, plus a lens flare when a
+  fixture points at you.
 - **Lighting Remote** — link fixtures and aim them together:
   - use on a fixture to link or unlink it (linked fixtures are outlined while you hold the remote);
   - use on any block to point every linked fixture at that spot;
@@ -76,20 +81,26 @@ Client config (`config/lumen_rigs-client.toml`):
 | `beams` | true | draw visible beams |
 | `beamStrength` | 1.0 | how visible the beams are |
 | `lighting` | true | let fixtures light up blocks and mobs |
+| `lightingEngine` | AUTO | `AUTO` uses Veil when installed, `BLOCK_LIGHT` always uses the built-in light |
 | `colorStrength` | 1.0 | how strongly colored light tints what it hits |
 | `maxLights` | 48 | how many of the nearest fixtures light up the world at once |
 
 ## Compatibility
 
 The light is computed by each player's game, so nothing is placed in the world: it is safe for servers and other
-mods, and it does not stop mobs from spawning. It hooks into Minecraft's own block and entity rendering; mods that
-replace the chunk renderer (such as Sodium or Embeddium) bypass it — the game keeps working, the fixtures and beams
-still show, but blocks are not lit. The game log says which light hooks are active.
+mods, and it does not stop mobs from spawning.
+
+- With [Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib) installed, the light is drawn by Veil's deferred
+  renderer. If Veil fails at runtime, the mod falls back to its own light by itself.
+- The built-in light hooks into Minecraft's block and entity rendering; mods that replace the chunk renderer (such as
+  Sodium or Embeddium) bypass it — the game keeps working, the fixtures and beams still show, but blocks are not lit.
+  The game log says which light hooks are active.
 
 ## Installation
 
 1. Install [NeoForge](https://neoforged.net) for Minecraft 1.21.1.
-2. Put this mod into the `mods` folder.
+2. Put this mod into the `mods` folder. For realistic lighting, also add
+   [Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib) (optional).
 
 The mod is needed on both the client and the server.
 

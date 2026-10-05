@@ -30,6 +30,11 @@ public final class Config {
             .comment("Let fixtures light up blocks and mobs. The light is client-side: it does not stop mobs from spawning.")
             .translation("lumen_rigs.configuration.lighting")
             .define("lighting", true);
+    private static final ModConfigSpec.EnumValue<LightingEngine> LIGHTING_ENGINE = CLIENT
+            .comment("AUTO uses Veil's per-pixel lights (with shadows and volumetric beams) when Veil is installed, otherwise",
+                    "the built-in block light. BLOCK_LIGHT always uses the built-in one.")
+            .translation("lumen_rigs.configuration.lightingEngine")
+            .defineEnum("lightingEngine", LightingEngine.AUTO);
     private static final ModConfigSpec.DoubleValue COLOR_STRENGTH = CLIENT
             .comment("How strongly colored light tints what it hits.")
             .translation("lumen_rigs.configuration.colorStrength")
@@ -43,6 +48,15 @@ public final class Config {
     public static final ModConfigSpec CLIENT_SPEC = CLIENT.build();
 
     private Config() {
+    }
+
+    public enum LightingEngine {
+        AUTO,
+        BLOCK_LIGHT
+    }
+
+    public static LightingEngine lightingEngine() {
+        return LIGHTING_ENGINE.get();
     }
 
     public static int remoteRange() {

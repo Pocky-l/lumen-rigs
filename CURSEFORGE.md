@@ -10,8 +10,11 @@ Aimable spotlights, floodlights, searchlights and soft panels with colored light
   - **Searchlight**: a tight 2–15° beam that reaches 64 blocks, made for sweeping the night sky.
   - **Soft Light Panel**: a flat panel that softly lights everything in front of it.
 - **Mount anywhere**: floor, walls or ceiling.
-- **Real directional light**: the beam lights exactly the spot it points at, fades towards the edge and with distance,
-  and walls cast shadows. Mobs and players standing in it are lit too.
+- **Realistic light with [Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib)** (optional, recommended):
+  per-pixel spot and area lights like in a 3D renderer, with soft cone edges, shading by angle, block shadows and
+  beams that scatter in the air.
+- **Works without Veil too**: the mod's own directional light lights the spot the beam points at, with soft edges
+  and shadows behind walls, and lights up mobs and players in it.
 - **Any color**: 16 dye colors, a hue slider or warm white. Colors mix like light: red and green make yellow.
 - **Visible beams** with a lens flare when a fixture points at you.
 - **Lighting Remote**: link fixtures, then aim them all at a block, make them follow a mob or player, or shine where
@@ -33,12 +36,13 @@ Use JEI or the recipe book for the exact shapes.
 ## Compatibility
 
 The light is client-side: nothing is placed in the world, so it is safe for servers and other mods, and it does not
-stop mobs from spawning. Mods that replace the chunk renderer (Sodium, Embeddium) bypass the light: the game keeps
-working and the fixtures and beams still show, but blocks are not lit.
+stop mobs from spawning. Without Veil, mods that replace the chunk renderer (Sodium, Embeddium) bypass the built-in
+light: the game keeps working and the fixtures and beams still show, but blocks are not lit.
 
 ## Requirements
 
 [NeoForge](https://neoforged.net) 1.21.1. Needed on both the client and the server.
+Optional: [Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib) for realistic per-pixel lighting.
 
 ## Credits
 

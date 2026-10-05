@@ -35,6 +35,7 @@ import org.joml.Vector3f;
 import com.pockyl.lumen_rigs.Config;
 import com.pockyl.lumen_rigs.LumenRigs;
 import com.pockyl.lumen_rigs.block.FixtureBlockEntity;
+import com.pockyl.lumen_rigs.client.light.ClientLighting;
 import com.pockyl.lumen_rigs.fixture.Aim;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
 
@@ -136,7 +137,8 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
 
         Vec3 toCamera = camera.subtract(lens);
         double facing = toCamera.lengthSqr() < 1.0E-6 ? 0 : Math.max(0, toCamera.normalize().dot(direction));
-        if (Config.beams()) {
+        // Veil scatters the light in the air itself (volumetric beams); the strips are the fallback.
+        if (Config.beams() && !ClientLighting.useVeil()) {
             double half = Math.toRadians(fixture.settings().beam() / 2);
             double length = beamLength(level, lens, direction, type.range());
             // Narrow beams concentrate their light; wide ones spread it thin.

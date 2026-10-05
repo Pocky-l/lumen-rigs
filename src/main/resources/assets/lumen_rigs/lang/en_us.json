@@ -61,5 +61,7 @@
   "lumen_rigs.configuration.colorStrength": "Color strength",
   "lumen_rigs.configuration.colorStrength.tooltip": "How strongly colored light tints what it hits.",
   "lumen_rigs.configuration.maxLights": "Max lights",
-  "lumen_rigs.configuration.maxLights.tooltip": "At most this many fixtures (the nearest ones) light up the world at once. Moving lights re-render the chunks they reach, so lower this on weak computers."
+  "lumen_rigs.configuration.maxLights.tooltip": "At most this many fixtures (the nearest ones) light up the world at once. Moving lights re-render the chunks they reach, so lower this on weak computers.",
+  "lumen_rigs.configuration.lightingEngine": "Lighting engine",
+  "lumen_rigs.configuration.lightingEngine.tooltip": "AUTO uses Veil's per-pixel lights (with shadows and volumetric beams) when Veil is installed, otherwise the built-in block light. BLOCK_LIGHT always uses the built-in one."
 }

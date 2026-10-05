@@ -24,8 +24,6 @@ import com.pockyl.lumen_rigs.block.FixtureBlockEntity;
 import com.pockyl.lumen_rigs.fixture.FixtureSettings;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -206,7 +204,9 @@ public final class FixtureLights {
         if (level == null) {
             return;
         }
-        List<FixtureBlockEntity> active = Config.lighting() ? activeFixtures(level, minecraft.gameRenderer.getMainCamera().getPosition())
+        // With Veil the light is drawn per pixel instead; the block light then stays vanilla.
+        List<FixtureBlockEntity> active = Config.lighting() && !ClientLighting.useVeil()
+                ? ClientLighting.activeFixtures(level, minecraft.gameRenderer.getMainCamera().getPosition())
                 : List.of();
         long time = level.getGameTime();
         Map<FixtureBlockEntity, Built> previous = new IdentityHashMap<>(BUILT);
@@ -233,18 +233,6 @@ public final class FixtureLights {
             markChanged(gone.source(), null);
         }
         sources = BUILT.values().stream().map(Built::source).toArray(LightSource[]::new);
-    }
-
-    private static List<FixtureBlockEntity> activeFixtures(ClientLevel level, Vec3 camera) {
-        List<FixtureBlockEntity> fixtures = new ArrayList<>();
-        for (FixtureBlockEntity fixture : FixtureBlockEntity.CLIENT_FIXTURES) {
-            if (fixture.getLevel() == level && !fixture.isRemoved() && fixture.effectiveBrightness() > 0) {
-                fixtures.add(fixture);
-            }
-        }
-        fixtures.sort(Comparator.comparingDouble(fixture -> fixture.getBlockPos().getCenter().distanceToSqr(camera)));
-        int max = Config.maxLights();
-        return fixtures.size() > max ? fixtures.subList(0, max) : fixtures;
     }
 
     // ------------------------------------------------------------------------------------------------

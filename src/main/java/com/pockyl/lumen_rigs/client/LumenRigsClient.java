@@ -13,7 +13,9 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 import com.pockyl.lumen_rigs.LumenRigs;
 import com.pockyl.lumen_rigs.block.FixtureBlockEntity;
+import com.pockyl.lumen_rigs.client.light.ClientLighting;
 import com.pockyl.lumen_rigs.client.light.MixinCheck;
+import com.pockyl.lumen_rigs.client.light.veil.VeilFixtureLights;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
 import com.pockyl.lumen_rigs.registry.ModBlockEntities;
 import com.pockyl.lumen_rigs.registry.ModBlocks;
@@ -29,6 +31,10 @@ public final class LumenRigsClient {
         modBus.addListener(LumenRigsClient::registerModels);
         modBus.addListener(LumenRigsClient::registerBlockColors);
         modBus.addListener((FMLClientSetupEvent event) -> MixinCheck.log());
+        if (ClientLighting.veilLoaded()) {
+            // Only touched when Veil is installed, so its classes are never needed otherwise.
+            VeilFixtureLights.register();
+        }
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {

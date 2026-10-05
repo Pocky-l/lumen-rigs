@@ -61,5 +61,7 @@
   "lumen_rigs.configuration.colorStrength": "Сила цвета",
   "lumen_rigs.configuration.colorStrength.tooltip": "Насколько сильно цветной свет окрашивает то, на что падает.",
   "lumen_rigs.configuration.maxLights": "Максимум источников",
-  "lumen_rigs.configuration.maxLights.tooltip": "Сколько ближайших приборов одновременно освещают мир. Движущийся свет перерисовывает чанки, на слабых компьютерах уменьшите."
+  "lumen_rigs.configuration.maxLights.tooltip": "Сколько ближайших приборов одновременно освещают мир. Движущийся свет перерисовывает чанки, на слабых компьютерах уменьшите.",
+  "lumen_rigs.configuration.lightingEngine": "Движок освещения",
+  "lumen_rigs.configuration.lightingEngine.tooltip": "AUTO — попиксельный свет Veil (с тенями и объёмными лучами), если Veil установлен, иначе встроенный блочный свет. BLOCK_LIGHT — всегда встроенный."
 }

@@ -21,6 +21,15 @@ sourceSets.main.resources {
 }
 
 repositories {
+    maven {
+        name = 'BlameJared (Veil)'
+        url = 'https://maven.blamejared.com/'
+        content {
+            includeGroup('foundry.veil')
+            includeGroup('gg.moonflower')
+            includeGroup('io.github.ocelot')
+        }
+    }
 }
 
 neoForge {
@@ -76,6 +85,9 @@ configurations {
 }
 
 dependencies {
+    // Optional: with Veil installed, fixtures use its deferred lighting (per-pixel light, shadows, volumetric beams).
+    compileOnly "foundry.veil:veil-neoforge-${minecraft_version}:${veil_version}"
+    localRuntime "foundry.veil:veil-neoforge-${minecraft_version}:${veil_version}"
 }
 
 var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
