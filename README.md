@@ -17,7 +17,7 @@
 
 ## Features
 
-- **Four fixtures** and a **Haze Machine**; the fixtures sit on motorized yokes that turns smoothly to its aim:
+- **Four fixtures**, each on a motorized yoke that turns smoothly to its aim:
   - **Spotlight** — a zoomable stage spot, beam angle 5–45°, reaches 32 blocks.
   - **Floodlight** — a wide LED wash with barn doors, 40–120°, for areas and facades.
   - **Searchlight** — a long tight beam of 2–15° that reaches 64 blocks; sweep the night sky with it.
@@ -42,8 +42,6 @@
   hard-edged spot to soft diffuse light), **range** (a searchlight reaches 256 blocks into the sky), **beam
   visibility** in the air, redstone mode, and the color. Every change shows instantly.
 - **Atmosphere** — beams show more in rain, thunderstorms and under water, like real ones.
-- **Haze Machine** — fills the air with drifting stage haze: beams passing through it become dense and the haze glows
-  in their color. Right-click to switch it on or off; a redstone signal runs it too.
 - **Redstone** — ignore it, turn on or off with a signal, or use the signal strength as a dimmer.
 
 ## Controls
@@ -56,7 +54,6 @@
 | Follow a mob or player | *Use* the remote on it |
 | Shine where you look | *Use* the remote into the air |
 | Forget all links | *Sneak* + *Use* the remote into the air |
-| Switch a Haze Machine on / off | *Use* on it (a redstone signal also runs it) |
 
 ## Crafting
 
@@ -66,7 +63,6 @@
 | Floodlight | 3 Iron Ingots on top; 2 Redstone Lamps and a Glass Pane in the middle; Copper Ingot below |
 | Searchlight | 3 Iron Ingots on top; 2 Redstone Lamps and Glass in the middle; Iron Block, Copper Ingot, Iron Block below |
 | Soft Light Panel (2) | 3 Paper on top; Iron Ingot, Glowstone, Iron Ingot below |
-| Haze Machine | Iron Ingot, Glass, Iron Ingot; Iron Ingot, Campfire, Iron Ingot; Iron Ingot, Redstone, Iron Ingot |
 | Lighting Remote | Redstone Torch, Redstone and Iron Ingot in a column |
 
 In creative mode everything is in the **Pocky Mods** tab, the fixtures also in **Functional Blocks** and the remote

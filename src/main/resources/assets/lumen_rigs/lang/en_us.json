@@ -64,9 +64,6 @@
   "lumen_rigs.configuration.maxLights.tooltip": "At most this many fixtures (the nearest ones) light up the world at once. Moving lights re-render the chunks they reach, so lower this on weak computers.",
   "lumen_rigs.configuration.lightingEngine": "Lighting engine",
   "lumen_rigs.configuration.lightingEngine.tooltip": "AUTO uses Veil's per-pixel lights (with shadows and volumetric beams) when Veil is installed, otherwise the built-in block light. BLOCK_LIGHT always uses the built-in one.",
-  "block.lumen_rigs.haze_machine": "Haze Machine",
-  "block.lumen_rigs.haze_machine.on": "Haze machine on",
-  "block.lumen_rigs.haze_machine.off": "Haze machine off",
   "lumen_rigs.screen.section.aim": "Aim",
   "lumen_rigs.screen.section.light": "Light",
   "lumen_rigs.screen.beam.hint": "How wide the cone of light is.",
@@ -78,5 +75,5 @@
   "lumen_rigs.screen.range": "Range: %s",
   "lumen_rigs.screen.range.hint": "How far the light reaches. A searchlight reaches 256 blocks into the sky.",
   "lumen_rigs.screen.haze": "Beam visibility: %s",
-  "lumen_rigs.screen.haze.hint": "How much the beam shows in the air. Rain, storms, water and a Haze Machine make beams denser."
+  "lumen_rigs.screen.haze.hint": "How much the beam shows in the air. Rain, storms and water make beams denser."
 }

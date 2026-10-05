@@ -19,4 +19,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to 256 blocks into the sky), beam visibility, 16 colors plus a hue slider, aim modes (manual, point, follow, sweep)
   and redstone modes (switch or dimmer).
 - Beams show more in rain, thunderstorms and under water.
-- Haze Machine: fills the air with stage haze that makes beams dense and glows in their color.
