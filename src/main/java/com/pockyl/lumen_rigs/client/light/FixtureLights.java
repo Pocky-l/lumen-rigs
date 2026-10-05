@@ -48,6 +48,7 @@ public final class FixtureLights {
     private static final int MAX_RAYS_PER_SIDE = 26;
     /** Light lost per block when a lit spot softens into its neighbors. */
     private static final int SOFTEN_STEP = 3;
+    private static final double MAX_BLOCK_LIGHT_RANGE = 96;
     private static final Direction[] DIRECTIONS = Direction.values();
 
     private static volatile LightSource[] sources = new LightSource[0];
@@ -68,7 +69,13 @@ public final class FixtureLights {
     }
 
     /** What a source was built from, to know when it has to be rebuilt. */
-    private record Built(LightSource source, Vec3 direction, int brightness, float beam, int color, long builtAt) {
+    private record Built(LightSource source, Vec3 direction, int brightness, FixtureSettings settings, long builtAt) {
+
+        /** Whether the settings that shape the light (not the aim, which is compared by direction) changed. */
+        boolean shapeChanged(FixtureSettings current) {
+            return settings.beam() != current.beam() || settings.color() != current.color() || settings.power() != current.power()
+                    || settings.softness() != current.softness() || settings.range() != current.range();
+        }
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -217,14 +224,14 @@ public final class FixtureLights {
             Vec3 direction = fixture.headDirection(1.0F);
             FixtureSettings settings = fixture.settings();
             int brightness = fixture.effectiveBrightness();
-            boolean changed = old == null || old.brightness() != brightness || old.beam() != settings.beam() || old.color() != settings.color()
+            boolean changed = old == null || old.brightness() != brightness || old.shapeChanged(settings)
                     || Math.acos(Mth.clamp(old.direction().dot(direction), -1, 1)) > TURN_THRESHOLD;
             boolean due = old == null || changed && time - old.builtAt() >= 2 || time - old.builtAt() >= REFRESH_INTERVAL;
             if (due && (old == null || builds < MAX_BUILDS_PER_TICK)) {
                 builds++;
                 LightSource source = build(level, fixture, direction, brightness);
                 markChanged(old != null ? old.source() : null, source);
-                BUILT.put(fixture, new Built(source, direction, brightness, settings.beam(), settings.color(), time));
+                BUILT.put(fixture, new Built(source, direction, brightness, settings, time));
             } else {
                 BUILT.put(fixture, old);
             }
@@ -271,9 +278,12 @@ public final class FixtureLights {
 
     /** Rays spread over the beam cone; each lights the spot where it hits something. */
     private static void castBeam(ClientLevel level, FixtureBlockEntity fixture, Vec3 direction, int brightness, Long2ByteOpenHashMap light) {
-        FixtureType type = fixture.type();
-        double half = Math.toRadians(fixture.settings().beam() / 2);
-        double range = type.range();
+        FixtureSettings settings = fixture.settings();
+        double half = Math.toRadians(settings.beam() / 2);
+        // Block light cannot show far beams well anyway; long rays would only cost time.
+        double range = Math.min(settings.range(), MAX_BLOCK_LIGHT_RANGE);
+        double edgeStart = half * (1 - 0.9 * settings.softness());
+        double power = 0.6 + 0.4 * settings.power();
         Vec3 origin = fixture.lens(direction);
         Vec3 u = Math.abs(direction.y) < 0.95 ? direction.cross(new Vec3(0, 1, 0)).normalize() : direction.cross(new Vec3(1, 0, 0)).normalize();
         Vec3 v = u.cross(direction).normalize();
@@ -290,15 +300,15 @@ public final class FixtureLights {
                     continue;
                 }
                 Vec3 ray = direction.add(u.scale(Math.tan(ax))).add(v.scale(Math.tan(ay))).normalize();
-                // Soft edge over the outer third of the cone.
-                double edge = 1 - smoothstep(half * 0.66, half + 1.0E-6, angle);
-                cast(level, origin, ray, range, brightness, edge, light, pos);
+                // The softness sets how much of the cone fades out towards its edge.
+                double edge = 1 - smoothstep(edgeStart, half + 1.0E-6, angle);
+                cast(level, origin, ray, range, brightness * power, edge, light, pos);
             }
         }
     }
 
     /** Walks the ray block by block until it hits an opaque block, then lights the last open block before it. */
-    private static void cast(ClientLevel level, Vec3 origin, Vec3 ray, double range, int brightness, double edge, Long2ByteOpenHashMap light,
+    private static void cast(ClientLevel level, Vec3 origin, Vec3 ray, double range, double brightness, double edge, Long2ByteOpenHashMap light,
             BlockPos.MutableBlockPos pos) {
         int x = Mth.floor(origin.x);
         int y = Mth.floor(origin.y);
@@ -336,7 +346,7 @@ public final class FixtureLights {
             BlockState state = level.getBlockState(pos);
             if (state.getLightBlock(level, pos) >= 15 || !state.getCollisionShape(level, pos).isEmpty() && !state.propagatesSkylightDown(level, pos)) {
                 double falloff = 1 - 0.55 * (travelled / range) * (travelled / range);
-                int value = (int) Math.round(brightness * edge * falloff);
+                int value = (int) Math.min(15, Math.round(brightness * edge * falloff));
                 if (value > 0) {
                     long key = BlockPos.asLong(lastX, lastY, lastZ);
                     if (value > light.get(key)) {
@@ -363,7 +373,8 @@ public final class FixtureLights {
     /** Vanilla-like light from the panel's face, only into the half-space in front of it. */
     private static void fillPanel(ClientLevel level, FixtureBlockEntity fixture, int brightness, Long2ByteOpenHashMap light) {
         BlockPos front = fixture.getBlockPos();
-        light.put(front.asLong(), (byte) brightness);
+        int level0 = (int) Math.min(15, Math.round(brightness * (0.6 + 0.4 * fixture.settings().power())));
+        light.put(front.asLong(), (byte) level0);
         LongArrayFIFOQueue queue = new LongArrayFIFOQueue();
         queue.enqueue(front.asLong());
         spread(level, light, queue, 1, fixture);

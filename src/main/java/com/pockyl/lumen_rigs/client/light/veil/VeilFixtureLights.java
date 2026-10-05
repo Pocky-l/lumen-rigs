@@ -17,7 +17,9 @@ import org.joml.Vector3f;
 import com.pockyl.lumen_rigs.Config;
 import com.pockyl.lumen_rigs.LumenRigs;
 import com.pockyl.lumen_rigs.block.FixtureBlockEntity;
+import com.pockyl.lumen_rigs.client.light.Atmosphere;
 import com.pockyl.lumen_rigs.client.light.ClientLighting;
+import com.pockyl.lumen_rigs.fixture.FixtureSettings;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
 
 import java.util.HashSet;
@@ -32,9 +34,6 @@ import java.util.Set;
  * installed; every frame the lights follow the fixtures' heads.
  */
 public final class VeilFixtureLights {
-    /** How much the cone softens towards its edge, as a share of the half angle. */
-    private static final float EDGE_SOFTNESS = 0.35F;
-
     private static final Map<FixtureBlockEntity, LightRenderHandle<? extends LightData>> HANDLES = new IdentityHashMap<>();
     private static ClientLevel lastLevel;
     private static boolean failed;
@@ -100,18 +99,21 @@ public final class VeilFixtureLights {
 
     private static void updateSpot(SpotLightData spot, FixtureBlockEntity fixture, float partialTick) {
         FixtureType type = fixture.type();
+        FixtureSettings settings = fixture.settings();
         Vec3 direction = fixture.headDirection(partialTick);
         Vec3 lens = fixture.lens(direction);
-        float half = (float) Math.toRadians(fixture.settings().beam() / 2);
+        float half = (float) Math.toRadians(settings.beam() / 2);
         spot.getPositionMutable().set(lens.x, lens.y, lens.z);
         orient(spot.getOrientationMutable(), direction);
         spot.setSize(half);
-        spot.setAngle(half * EDGE_SOFTNESS);
-        spot.setDistance(type.range());
+        // Softness 0 is a hard-edged profile spot, 1 fades over almost the whole cone.
+        spot.setAngle(half * (0.05F + 0.9F * settings.softness()));
+        spot.setDistance(settings.range());
         spot.setOcclusionEnabled(true);
-        spot.setInscatteringStrength(Config.beams() ? scattering(type) * Config.beamStrength() : 0);
-        spot.setColor(fixture.settings().color());
-        spot.setBrightness(fixture.effectiveBrightness() / 15.0F * intensity(type));
+        float air = Atmosphere.scattering(fixture.getLevel(), lens);
+        spot.setInscatteringStrength(Config.beams() ? scattering(type) * settings.haze() * air * Config.beamStrength() : 0);
+        spot.setColor(settings.color());
+        spot.setBrightness(fixture.effectiveBrightness() / 15.0F * settings.power() * intensity(type));
         spot.markDirty();
     }
 
@@ -122,11 +124,11 @@ public final class VeilFixtureLights {
         orient(area.getOrientationMutable(), normal);
         area.setSize(0.42, 0.42);
         area.setAngle((float) Math.toRadians(80));
-        area.setDistance(FixtureType.SOFT_PANEL.range());
+        area.setDistance(fixture.settings().range());
         area.setOcclusionEnabled(true);
         area.setInscatteringStrength(0);
         area.setColor(fixture.settings().color());
-        area.setBrightness(fixture.effectiveBrightness() / 15.0F * intensity(FixtureType.SOFT_PANEL));
+        area.setBrightness(fixture.effectiveBrightness() / 15.0F * fixture.settings().power() * intensity(FixtureType.SOFT_PANEL));
         area.markDirty();
     }
 

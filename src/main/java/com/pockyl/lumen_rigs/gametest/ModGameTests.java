@@ -3,6 +3,7 @@ package com.pockyl.lumen_rigs.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
@@ -93,7 +94,7 @@ public final class ModGameTests {
     @GameTest(template = "empty", batch = "sweepSwingsAroundThePan")
     public static void sweepSwingsAroundThePan(GameTestHelper helper) {
         FixtureBlockEntity fixture = place(helper, new BlockPos(1, 2, 1), ModBlocks.SEARCHLIGHT.get().defaultBlockState());
-        fixture.applySettings(new FixtureSettings(0, 30, 6, 15, 0xFFFFFF, AimMode.SWEEP, RedstoneMode.IGNORE, 40, 6));
+        fixture.applySettings(FixtureSettings.defaults(FixtureType.SEARCHLIGHT).withAim(0, 30, AimMode.SWEEP).withSweep(40, 6));
         // 6 sweeps per minute: a quarter swing after 50 ticks puts it at the full width.
         float pan = Aim.pan(fixture.desiredDirection(50));
         helper.assertTrue(Math.abs(Math.abs(pan) - 40) < 0.5, "swings out by the sweep width, got " + pan);
@@ -109,7 +110,7 @@ public final class ModGameTests {
         helper.assertTrue(RedstoneMode.DIMMER.apply(15, 5) == 5, "the dimmer follows the signal");
 
         FixtureBlockEntity fixture = place(helper, new BlockPos(1, 2, 1), ModBlocks.FLOODLIGHT.get().defaultBlockState());
-        fixture.applySettings(new FixtureSettings(0, 0, 80, 15, 0xFFFFFF, AimMode.MANUAL, RedstoneMode.ON_WHEN_POWERED, 40, 6));
+        fixture.applySettings(FixtureSettings.defaults(FixtureType.FLOODLIGHT).withRedstone(RedstoneMode.ON_WHEN_POWERED));
         helper.assertTrue(fixture.effectiveBrightness() == 0, "dark without a signal");
         helper.setBlock(new BlockPos(2, 2, 1), Blocks.REDSTONE_BLOCK);
         helper.succeedWhen(() -> helper.assertTrue(fixture.effectiveBrightness() == 15, "lit by the redstone block"));
@@ -118,8 +119,11 @@ public final class ModGameTests {
     @GameTest(template = "empty", batch = "settingsFromClientsAreClamped")
     public static void settingsFromClientsAreClamped(GameTestHelper helper) {
         FixtureBlockEntity fixture = place(helper, new BlockPos(1, 2, 1), ModBlocks.SPOTLIGHT.get().defaultBlockState());
-        fixture.applySettings(new FixtureSettings(Float.NaN, 400, 999, 99, 0x7F123456, AimMode.MANUAL, RedstoneMode.IGNORE, -5, 1000));
+        fixture.applySettings(new FixtureSettings(Float.NaN, 400, 999, 99, 0x7F123456, AimMode.MANUAL, RedstoneMode.IGNORE, -5, 1000,
+                50, -1, Float.POSITIVE_INFINITY, 9999));
         FixtureSettings settings = fixture.settings();
+        helper.assertTrue(settings.power() == FixtureSettings.MAX_POWER && settings.softness() == 0, "power and softness clamped");
+        helper.assertTrue(settings.haze() == 1 && settings.range() == FixtureType.SPOTLIGHT.maxRange(), "haze and range clamped");
         helper.assertTrue(settings.pan() == 0 && settings.tilt() == 90, "aim clamped");
         helper.assertTrue(settings.beam() == FixtureType.SPOTLIGHT.maxBeam() && settings.brightness() == 15, "beam and brightness clamped");
         helper.assertTrue(settings.color() == 0x123456, "only RGB is kept");
@@ -152,6 +156,17 @@ public final class ModGameTests {
         helper.assertFalse(LightingRemoteItem.toggleLink(remote, GlobalPos.of(helper.getLevel().dimension(), first.getBlockPos())), "unlinked again");
         helper.assertTrue(LightingRemoteItem.links(remote).size() == 1, "one link left");
         cow.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", batch = "lightSettingsSurviveSaving")
+    public static void lightSettingsSurviveSaving(GameTestHelper helper) {
+        FixtureSettings settings = FixtureSettings.defaults(FixtureType.SEARCHLIGHT).withPower(2.5F).withSoftness(0.1F).withHaze(2)
+                .withRange(200).withColor(0x2E62FF);
+        FixtureSettings loaded = FixtureSettings.load(settings.save(), FixtureType.SEARCHLIGHT);
+        helper.assertTrue(loaded.equals(settings.clamp(FixtureType.SEARCHLIGHT)), "saved and loaded: " + loaded);
+        helper.assertTrue(FixtureSettings.load(new CompoundTag(), FixtureType.SOFT_PANEL).softness() == 1,
+                "a new panel is fully diffuse");
         helper.succeed();
     }
 

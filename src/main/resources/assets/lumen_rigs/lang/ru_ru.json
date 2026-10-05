@@ -63,5 +63,20 @@
   "lumen_rigs.configuration.maxLights": "Максимум источников",
   "lumen_rigs.configuration.maxLights.tooltip": "Сколько ближайших приборов одновременно освещают мир. Движущийся свет перерисовывает чанки, на слабых компьютерах уменьшите.",
   "lumen_rigs.configuration.lightingEngine": "Движок освещения",
-  "lumen_rigs.configuration.lightingEngine.tooltip": "AUTO — попиксельный свет Veil (с тенями и объёмными лучами), если Veil установлен, иначе встроенный блочный свет. BLOCK_LIGHT — всегда встроенный."
+  "lumen_rigs.configuration.lightingEngine.tooltip": "AUTO — попиксельный свет Veil (с тенями и объёмными лучами), если Veil установлен, иначе встроенный блочный свет. BLOCK_LIGHT — всегда встроенный.",
+  "block.lumen_rigs.haze_machine": "Генератор дыма",
+  "block.lumen_rigs.haze_machine.on": "Генератор дыма включён",
+  "block.lumen_rigs.haze_machine.off": "Генератор дыма выключен",
+  "lumen_rigs.screen.section.aim": "Наведение",
+  "lumen_rigs.screen.section.light": "Свет",
+  "lumen_rigs.screen.beam.hint": "Насколько широк конус света.",
+  "lumen_rigs.screen.brightness.hint": "Диммер. Редстоун в режиме диммера уменьшает его ещё.",
+  "lumen_rigs.screen.power": "Мощность: %s",
+  "lumen_rigs.screen.power.hint": "Сила лампы: ярче и дальше.",
+  "lumen_rigs.screen.softness": "Рассеянность: %s",
+  "lumen_rigs.screen.softness.hint": "0% — чёткое пятно с резким краем; 100% — мягкий рассеянный свет, плавно гаснущий по всему конусу.",
+  "lumen_rigs.screen.range": "Дальность: %s",
+  "lumen_rigs.screen.range.hint": "Как далеко достаёт свет. Поисковый прожектор светит на 256 блоков в небо.",
+  "lumen_rigs.screen.haze": "Видимость луча: %s",
+  "lumen_rigs.screen.haze.hint": "Насколько луч виден в воздухе. Дождь, гроза, вода и генератор дыма делают лучи гуще."
 }

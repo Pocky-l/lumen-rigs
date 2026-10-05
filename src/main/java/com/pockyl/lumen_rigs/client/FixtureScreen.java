@@ -27,11 +27,13 @@ import java.util.function.DoubleConsumer;
 import java.util.function.DoubleFunction;
 
 /**
- * Settings of one fixture. Every change shows immediately (the head turns while a slider is dragged) and is sent to
- * the server a few times a second, so the screen is also a live remote for the light.
+ * Settings of one fixture: aim on the left, the light itself on the right, colors below. Every change shows
+ * immediately (the head turns while a slider is dragged) and is sent to the server a few times a second, so the screen
+ * also works as a live control desk for the light.
  */
 public final class FixtureScreen extends Screen {
-    private static final int WIDTH = 284;
+    private static final int COLUMN = 186;
+    private static final int GAP = 12;
     private static final int ROW = 22;
     private static final int SEND_INTERVAL = 3;
     /** Light colors of the dyes, in {@link DyeColor} order; vivid, since they are colors of light. */
@@ -43,9 +45,10 @@ public final class FixtureScreen extends Screen {
     private FixtureSettings settings;
     private boolean dirty;
     private int sinceSend;
-    private int left;
     private int top;
-    private int colorLabelY;
+    private int aimX;
+    private int lightX;
+    private int colorY;
 
     private FixtureScreen(FixtureBlockEntity fixture) {
         super(fixture.getBlockState().getBlock().getName());
@@ -65,86 +68,107 @@ public final class FixtureScreen extends Screen {
     protected void init() {
         FixtureType type = fixture.type();
         boolean aimable = type.aimable();
-        boolean sweep = settings.mode() == AimMode.SWEEP;
-        int rows = (aimable ? 5 : 2) + (sweep && aimable ? 2 : 0) + 3;
-        left = (width - WIDTH) / 2;
-        top = Math.max(8, (height - rows * ROW - 40) / 2);
-        int y = top + 22;
+        int width = aimable ? COLUMN * 2 + GAP : COLUMN;
+        int left = (this.width - width) / 2;
+        aimX = left;
+        lightX = aimable ? left + COLUMN + GAP : left;
+        int rows = 8;
+        top = Math.max(6, (height - (rows * ROW + 2 * ROW + 50)) / 2);
+        int y0 = top + 26;
 
         if (aimable) {
-            addRenderableWidget(Button.builder(modeLabel(), button -> {
-                        update(settings.withMode(settings.mode().next()));
-                        rebuildWidgets();
-                    })
-                    .bounds(left, y, 110, 20)
-                    .tooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.mode." + key(settings.mode()) + ".hint")))
-                    .build());
+            initAim(type, y0);
         }
-        addRenderableWidget(Button.builder(redstoneLabel(), button -> {
-                    update(new FixtureSettings(settings.pan(), settings.tilt(), settings.beam(), settings.brightness(), settings.color(),
-                            settings.mode(), settings.redstone().next(), settings.sweepWidth(), settings.sweepSpeed()));
-                    button.setMessage(redstoneLabel());
-                })
-                .bounds(aimable ? left + 114 : left, y, aimable ? 100 : WIDTH, 20)
-                .build());
-        if (aimable) {
-            addRenderableWidget(Button.builder(Component.translatable("lumen_rigs.screen.aim_at_me"), button -> {
-                        aimAtPlayer();
-                        rebuildWidgets();
-                    })
-                    .bounds(left + 218, y, 66, 20)
-                    .tooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.aim_at_me.hint")))
-                    .build());
-        }
-        y += ROW + 4;
+        initLight(type, y0);
 
-        if (aimable) {
-            ValueSlider pan = slider(left, y, WIDTH, "pan", -180, 180, 1, settings.pan(), FixtureScreen::degrees,
-                    value -> update(settings.withAim((float) value, settings.tilt(), manualMode())));
-            pan.setTooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.pan.hint")));
-            y += ROW;
-            slider(left, y, WIDTH, "tilt", -90, 90, 1, settings.tilt(), FixtureScreen::degrees,
-                    value -> update(settings.withAim(settings.pan(), (float) value, manualMode())));
-            y += ROW;
-            slider(left, y, WIDTH, "beam", type.minBeam(), type.maxBeam(), 1, settings.beam(), FixtureScreen::degrees,
-                    value -> update(new FixtureSettings(settings.pan(), settings.tilt(), (float) value, settings.brightness(), settings.color(),
-                            settings.mode(), settings.redstone(), settings.sweepWidth(), settings.sweepSpeed())));
-            y += ROW;
-            if (sweep) {
-                slider(left, y, WIDTH, "sweep_width", FixtureSettings.MIN_SWEEP_WIDTH, FixtureSettings.MAX_SWEEP_WIDTH, 1, settings.sweepWidth(),
-                        FixtureScreen::degrees, value -> update(new FixtureSettings(settings.pan(), settings.tilt(), settings.beam(),
-                                settings.brightness(), settings.color(), settings.mode(), settings.redstone(), (float) value, settings.sweepSpeed())));
-                y += ROW;
-                slider(left, y, WIDTH, "sweep_speed", FixtureSettings.MIN_SWEEP_SPEED, FixtureSettings.MAX_SWEEP_SPEED, 1, settings.sweepSpeed(),
-                        value -> String.valueOf((int) value), value -> update(new FixtureSettings(settings.pan(), settings.tilt(), settings.beam(),
-                                settings.brightness(), settings.color(), settings.mode(), settings.redstone(), settings.sweepWidth(), (float) value)));
-                y += ROW;
-            }
-        }
-        slider(left, y, WIDTH, "brightness", 0, 15, 1, settings.brightness(), value -> String.valueOf((int) value),
-                value -> update(new FixtureSettings(settings.pan(), settings.tilt(), settings.beam(), (int) value, settings.color(), settings.mode(),
-                        settings.redstone(), settings.sweepWidth(), settings.sweepSpeed())));
-        y += ROW + 2;
-        colorLabelY = y;
-        y += 12;
-
-        // Colors: one swatch per dye, a hue slider and warm white.
+        // Colors: one swatch per dye, a hue slider and warm white, across the whole width.
+        colorY = y0 + 7 * ROW + 8;
+        int swatchY = colorY + 12;
+        int step = Math.min(17, width / PALETTE.length);
         for (int i = 0; i < PALETTE.length; i++) {
-            DyeColor dye = DyeColor.byId(i);
-            Swatch swatch = addRenderableWidget(new Swatch(left + i * 17 + 2, y, PALETTE[i]));
-            swatch.setTooltip(Tooltip.create(Component.translatable("color.minecraft." + dye.getName())));
+            Swatch swatch = addRenderableWidget(new Swatch(left + i * step, swatchY, Math.max(10, step - 2), PALETTE[i]));
+            swatch.setTooltip(Tooltip.create(Component.translatable("color.minecraft." + DyeColor.byId(i).getName())));
         }
-        y += ROW;
-        slider(left, y, 200, "hue", 0, 359, 1, hueOf(settings.color()), FixtureScreen::degrees,
-                value -> setColor(Mth.hsvToRgb((float) value / 360.0F, 0.85F, 1.0F)));
-        addRenderableWidget(Button.builder(Component.translatable("lumen_rigs.screen.warm_white"), button -> setColor(FixtureSettings.WARM_WHITE))
-                .bounds(left + 204, y, 80, 20)
+        int hueY = swatchY + 20;
+        slider(left, hueY, width - 84, "hue", 0, 359, 1, hueOf(settings.color()), FixtureScreen::degrees,
+                value -> update(settings.withColor(Mth.hsvToRgb((float) value / 360.0F, 0.85F, 1.0F))));
+        addRenderableWidget(Button.builder(Component.translatable("lumen_rigs.screen.warm_white"),
+                        button -> update(settings.withColor(FixtureSettings.WARM_WHITE)))
+                .bounds(left + width - 80, hueY, 80, 20)
                 .build());
-        y += ROW + 6;
 
         addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> onClose())
-                .bounds(left + WIDTH / 2 - 50, y, 100, 20)
+                .bounds(this.width / 2 - 50, hueY + ROW + 6, 100, 20)
                 .build());
+    }
+
+    /** Left column: where the fixture points. */
+    private void initAim(FixtureType type, int y) {
+        addRenderableWidget(Button.builder(modeLabel(), button -> {
+                    update(settings.withMode(settings.mode().next()));
+                    rebuildWidgets();
+                })
+                .bounds(aimX, y, COLUMN - 70, 20)
+                .tooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.mode." + key(settings.mode()) + ".hint")))
+                .build());
+        addRenderableWidget(Button.builder(Component.translatable("lumen_rigs.screen.aim_at_me"), button -> {
+                    aimAtPlayer();
+                    rebuildWidgets();
+                })
+                .bounds(aimX + COLUMN - 66, y, 66, 20)
+                .tooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.aim_at_me.hint")))
+                .build());
+        y += ROW;
+        slider(aimX, y, COLUMN, "pan", -180, 180, 1, settings.pan(), FixtureScreen::degrees,
+                value -> update(settings.withAim((float) value, settings.tilt(), manualMode())))
+                .setTooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.pan.hint")));
+        y += ROW;
+        slider(aimX, y, COLUMN, "tilt", -90, 90, 1, settings.tilt(), FixtureScreen::degrees,
+                value -> update(settings.withAim(settings.pan(), (float) value, manualMode())));
+        y += ROW;
+        slider(aimX, y, COLUMN, "beam", type.minBeam(), type.maxBeam(), 1, settings.beam(), FixtureScreen::degrees,
+                value -> update(settings.withBeam((float) value)))
+                .setTooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.beam.hint")));
+        y += ROW;
+        if (settings.mode() == AimMode.SWEEP) {
+            slider(aimX, y, COLUMN, "sweep_width", FixtureSettings.MIN_SWEEP_WIDTH, FixtureSettings.MAX_SWEEP_WIDTH, 1, settings.sweepWidth(),
+                    FixtureScreen::degrees, value -> update(settings.withSweep((float) value, settings.sweepSpeed())));
+            y += ROW;
+            slider(aimX, y, COLUMN, "sweep_speed", FixtureSettings.MIN_SWEEP_SPEED, FixtureSettings.MAX_SWEEP_SPEED, 1, settings.sweepSpeed(),
+                    value -> String.valueOf((int) value), value -> update(settings.withSweep(settings.sweepWidth(), (float) value)));
+        }
+    }
+
+    /** Right column: the light itself. */
+    private void initLight(FixtureType type, int y) {
+        addRenderableWidget(Button.builder(redstoneLabel(), button -> {
+                    update(settings.withRedstone(settings.redstone().next()));
+                    button.setMessage(redstoneLabel());
+                })
+                .bounds(lightX, y, COLUMN, 20)
+                .build());
+        y += ROW;
+        slider(lightX, y, COLUMN, "brightness", 0, 15, 1, settings.brightness(), value -> String.valueOf((int) value),
+                value -> update(settings.withBrightness((int) value)))
+                .setTooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.brightness.hint")));
+        y += ROW;
+        slider(lightX, y, COLUMN, "power", FixtureSettings.MIN_POWER * 100, FixtureSettings.MAX_POWER * 100, 5, settings.power() * 100,
+                FixtureScreen::percent, value -> update(settings.withPower((float) value / 100)))
+                .setTooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.power.hint")));
+        y += ROW;
+        slider(lightX, y, COLUMN, "softness", 0, 100, 1, settings.softness() * 100, FixtureScreen::percent,
+                value -> update(settings.withSoftness((float) value / 100)))
+                .setTooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.softness.hint")));
+        y += ROW;
+        slider(lightX, y, COLUMN, "range", type.minRange(), type.maxRange(), 1, settings.range(), value -> (int) value + " m",
+                value -> update(settings.withRange((float) value)))
+                .setTooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.range.hint")));
+        y += ROW;
+        if (type.aimable()) {
+            slider(lightX, y, COLUMN, "haze", 0, FixtureSettings.MAX_HAZE * 100, 5, settings.haze() * 100, FixtureScreen::percent,
+                    value -> update(settings.withHaze((float) value / 100)))
+                    .setTooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.haze.hint")));
+        }
     }
 
     private ValueSlider slider(int x, int y, int width, String name, double min, double max, double step, double value,
@@ -166,11 +190,6 @@ public final class FixtureScreen extends Screen {
             direction = direction.normalize();
             update(settings.withAim(Aim.pan(direction), Aim.tilt(direction), AimMode.MANUAL));
         }
-    }
-
-    private void setColor(int color) {
-        update(new FixtureSettings(settings.pan(), settings.tilt(), settings.beam(), settings.brightness(), color, settings.mode(),
-                settings.redstone(), settings.sweepWidth(), settings.sweepSpeed()));
     }
 
     /** Applies the change right away on this client and queues it for the server. */
@@ -215,11 +234,14 @@ public final class FixtureScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
-        graphics.drawCenteredString(font, title, width / 2, top + 6, 0xFFFFFF);
-        int colorY = colorLabelY;
-        graphics.drawString(font, Component.translatable("lumen_rigs.screen.color"), left + 2, colorY, 0xC0C0C0);
-        // The chosen color, next to the label.
-        graphics.fill(left + WIDTH - 40, colorY - 1, left + WIDTH - 2, colorY + 9, 0xFF000000 | settings.color());
+        graphics.drawCenteredString(font, title, width / 2, top + 2, 0xFFFFFF);
+        if (fixture.type().aimable()) {
+            graphics.drawString(font, Component.translatable("lumen_rigs.screen.section.aim"), aimX + 2, top + 15, 0xA0C8FF);
+        }
+        graphics.drawString(font, Component.translatable("lumen_rigs.screen.section.light"), lightX + 2, top + 15, 0xFFD48A);
+        graphics.drawString(font, Component.translatable("lumen_rigs.screen.color"), aimX + 2, colorY + 2, 0xC0C0C0);
+        int right = fixture.type().aimable() ? lightX + COLUMN : aimX + COLUMN;
+        graphics.fill(right - 40, colorY + 1, right - 2, colorY + 10, 0xFF000000 | settings.color());
     }
 
     private Component modeLabel() {
@@ -237,6 +259,10 @@ public final class FixtureScreen extends Screen {
 
     private static String degrees(double value) {
         return (int) value + "°";
+    }
+
+    private static String percent(double value) {
+        return (int) Math.round(value) + "%";
     }
 
     private static double hueOf(int color) {
@@ -299,14 +325,14 @@ public final class FixtureScreen extends Screen {
     private final class Swatch extends AbstractButton {
         private final int color;
 
-        Swatch(int x, int y, int color) {
-            super(x, y, 15, 15, Component.empty());
+        Swatch(int x, int y, int size, int color) {
+            super(x, y, size, size, Component.empty());
             this.color = color;
         }
 
         @Override
         public void onPress() {
-            setColor(color);
+            update(settings.withColor(color));
         }
 
         @Override

@@ -8,17 +8,20 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 import com.pockyl.lumen_rigs.LumenRigs;
 import com.pockyl.lumen_rigs.block.FixtureBlockEntity;
+import com.pockyl.lumen_rigs.block.HazeMachineBlock;
 import com.pockyl.lumen_rigs.client.light.ClientLighting;
 import com.pockyl.lumen_rigs.client.light.MixinCheck;
 import com.pockyl.lumen_rigs.client.light.veil.VeilFixtureLights;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
 import com.pockyl.lumen_rigs.registry.ModBlockEntities;
 import com.pockyl.lumen_rigs.registry.ModBlocks;
+import com.pockyl.lumen_rigs.registry.ModParticles;
 
 @Mod(value = LumenRigs.MOD_ID, dist = Dist.CLIENT)
 public final class LumenRigsClient {
@@ -30,6 +33,7 @@ public final class LumenRigsClient {
         modBus.addListener(LumenRigsClient::registerRenderers);
         modBus.addListener(LumenRigsClient::registerModels);
         modBus.addListener(LumenRigsClient::registerBlockColors);
+        modBus.addListener(LumenRigsClient::registerParticles);
         modBus.addListener((FMLClientSetupEvent event) -> MixinCheck.log());
         if (ClientLighting.veilLoaded()) {
             // Only touched when Veil is installed, so its classes are never needed otherwise.
@@ -59,5 +63,12 @@ public final class LumenRigsClient {
             }
             return fixture.effectiveBrightness() > 0 ? 0xFF000000 | fixture.settings().color() : 0xFF000000 | OFF_LENS;
         }, ModBlocks.SOFT_PANEL.get());
+        // The haze machine's status light: green while it runs, red when it is off.
+        event.register((state, level, pos, tintIndex) -> HazeMachineBlock.running(state) ? 0xFF55FF66 : 0xFFFF4040,
+                ModBlocks.HAZE_MACHINE.get());
+    }
+
+    private static void registerParticles(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ModParticles.HAZE.get(), HazeParticle.Provider::new);
     }
 }

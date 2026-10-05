@@ -19,8 +19,11 @@ Aimable spotlights, floodlights, searchlights and soft panels with colored light
 - **Visible beams** with a lens flare when a fixture points at you.
 - **Lighting Remote**: link fixtures, then aim them all at a block, make them follow a mob or player, or shine where
   you look. Linked fixtures are outlined while you hold it.
-- **Settings screen** (right-click a fixture): pan, tilt, beam angle, brightness, color, aim mode (manual, point,
-  follow, sweep), sweep width and speed, redstone mode and "Aim at me". Changes show instantly.
+- **Settings screen** (right-click a fixture): aim mode (manual, point, follow, sweep), pan, tilt, beam angle, sweep,
+  "Aim at me"; brightness, **power** (25–400%), **softness** (crisp spot to diffuse light), **range** (searchlights
+  reach 256 blocks into the sky), **beam visibility**, redstone mode and color. Changes show instantly.
+- **Atmosphere**: beams show more in rain, storms and under water.
+- **Haze Machine**: fills the air with stage haze that glows in the color of the beams passing through it.
 - **Redstone**: ignore it, switch with a signal, or use the signal strength as a dimmer.
 
 ## Crafting
@@ -29,6 +32,7 @@ Aimable spotlights, floodlights, searchlights and soft panels with colored light
 - **Floodlight**: iron ingots, two redstone lamps, a glass pane and a copper ingot.
 - **Searchlight**: iron ingots, two redstone lamps, glass, iron blocks and a copper ingot.
 - **Soft Light Panel** (2): paper, iron ingots and glowstone.
+- **Haze Machine**: iron ingots, glass, a campfire and redstone.
 - **Lighting Remote**: a redstone torch, redstone and an iron ingot.
 
 Use JEI or the recipe book for the exact shapes.

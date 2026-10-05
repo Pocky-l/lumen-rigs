@@ -15,5 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   beams.
 - Visible beams and a lens flare when a fixture points at you.
 - Lighting Remote: link fixtures, aim them at a block, make them follow a mob or player, or shine where you look.
-- Settings screen with pan, tilt, beam angle, brightness, 16 colors plus a hue slider, aim modes (manual, point,
-  follow, sweep) and redstone modes (switch or dimmer).
+- Settings screen with pan, tilt, beam angle, brightness, power, softness (crisp to diffuse), range (searchlights up
+  to 256 blocks into the sky), beam visibility, 16 colors plus a hue slider, aim modes (manual, point, follow, sweep)
+  and redstone modes (switch or dimmer).
+- Beams show more in rain, thunderstorms and under water.
+- Haze Machine: fills the air with stage haze that makes beams dense and glows in their color.

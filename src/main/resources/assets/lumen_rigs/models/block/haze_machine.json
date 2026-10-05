@@ -1,0 +1,362 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "housing": "lumen_rigs:block/housing",
+    "metal": "lumen_rigs:block/metal",
+    "lens": "lumen_rigs:block/lens",
+    "fins": "lumen_rigs:block/fins",
+    "bezel": "lumen_rigs:block/bezel",
+    "led": "lumen_rigs:block/led",
+    "grille": "lumen_rigs:block/grille",
+    "particle": "lumen_rigs:block/housing"
+  },
+  "elements": [
+    {
+      "from": [
+        2.5,
+        0,
+        3
+      ],
+      "to": [
+        13.5,
+        1,
+        14
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2.5,
+            7.5,
+            13.5,
+            8.5
+          ],
+          "texture": "#metal"
+        },
+        "south": {
+          "uv": [
+            2.5,
+            7.5,
+            13.5,
+            8.5
+          ],
+          "texture": "#metal"
+        },
+        "east": {
+          "uv": [
+            2.5,
+            7.5,
+            13.5,
+            8.5
+          ],
+          "texture": "#metal"
+        },
+        "west": {
+          "uv": [
+            2.5,
+            7.5,
+            13.5,
+            8.5
+          ],
+          "texture": "#metal"
+        },
+        "up": {
+          "uv": [
+            2.5,
+            2.5,
+            13.5,
+            13.5
+          ],
+          "texture": "#metal"
+        },
+        "down": {
+          "uv": [
+            2.5,
+            2.5,
+            13.5,
+            13.5
+          ],
+          "texture": "#metal"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        1,
+        3.5
+      ],
+      "to": [
+        13,
+        8,
+        13.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            3.0,
+            4.5,
+            13.0,
+            11.5
+          ],
+          "texture": "#housing"
+        },
+        "south": {
+          "uv": [
+            3.0,
+            4.5,
+            13.0,
+            11.5
+          ],
+          "texture": "#housing"
+        },
+        "east": {
+          "uv": [
+            3.0,
+            4.5,
+            13.0,
+            11.5
+          ],
+          "texture": "#housing"
+        },
+        "west": {
+          "uv": [
+            3.0,
+            4.5,
+            13.0,
+            11.5
+          ],
+          "texture": "#housing"
+        },
+        "up": {
+          "uv": [
+            3.0,
+            3.0,
+            13.0,
+            13.0
+          ],
+          "texture": "#housing"
+        },
+        "down": {
+          "uv": [
+            3.0,
+            3.0,
+            13.0,
+            13.0
+          ],
+          "texture": "#housing"
+        }
+      }
+    },
+    {
+      "from": [
+        3.5,
+        8,
+        6
+      ],
+      "to": [
+        12.5,
+        8.5,
+        11
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            3.5,
+            5.5,
+            12.5,
+            10.5
+          ],
+          "texture": "#grille"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        3,
+        1.5
+      ],
+      "to": [
+        10,
+        6,
+        3.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.0,
+            6.5,
+            10.0,
+            9.5
+          ],
+          "texture": "#bezel"
+        },
+        "south": {
+          "uv": [
+            6.0,
+            6.5,
+            10.0,
+            9.5
+          ],
+          "texture": "#bezel"
+        },
+        "east": {
+          "uv": [
+            7.0,
+            6.5,
+            9.0,
+            9.5
+          ],
+          "texture": "#bezel"
+        },
+        "west": {
+          "uv": [
+            7.0,
+            6.5,
+            9.0,
+            9.5
+          ],
+          "texture": "#bezel"
+        },
+        "up": {
+          "uv": [
+            6.0,
+            7.0,
+            10.0,
+            9.0
+          ],
+          "texture": "#bezel"
+        },
+        "down": {
+          "uv": [
+            6.0,
+            7.0,
+            10.0,
+            9.0
+          ],
+          "texture": "#bezel"
+        }
+      }
+    },
+    {
+      "from": [
+        6.5,
+        3.5,
+        1.4
+      ],
+      "to": [
+        9.5,
+        5.5,
+        1.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.5,
+            7.0,
+            9.5,
+            9.0
+          ],
+          "texture": "#fins"
+        }
+      }
+    },
+    {
+      "from": [
+        10.5,
+        5.5,
+        3.4
+      ],
+      "to": [
+        12,
+        7,
+        3.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7.25,
+            7.25,
+            8.75,
+            8.75
+          ],
+          "texture": "#lens",
+          "tintindex": 0
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      },
+      "shade": false
+    },
+    {
+      "from": [
+        4,
+        8,
+        12
+      ],
+      "to": [
+        12,
+        9,
+        13
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.0,
+            7.5,
+            12.0,
+            8.5
+          ],
+          "texture": "#metal"
+        },
+        "south": {
+          "uv": [
+            4.0,
+            7.5,
+            12.0,
+            8.5
+          ],
+          "texture": "#metal"
+        },
+        "east": {
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ],
+          "texture": "#metal"
+        },
+        "west": {
+          "uv": [
+            7.5,
+            7.5,
+            8.5,
+            8.5
+          ],
+          "texture": "#metal"
+        },
+        "up": {
+          "uv": [
+            4.0,
+            7.5,
+            12.0,
+            8.5
+          ],
+          "texture": "#metal"
+        },
+        "down": {
+          "uv": [
+            4.0,
+            7.5,
+            12.0,
+            8.5
+          ],
+          "texture": "#metal"
+        }
+      }
+    }
+  ]
+}

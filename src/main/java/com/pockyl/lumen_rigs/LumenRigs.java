@@ -16,6 +16,7 @@ import com.pockyl.lumen_rigs.registry.ModBlockEntities;
 import com.pockyl.lumen_rigs.registry.ModBlocks;
 import com.pockyl.lumen_rigs.registry.ModDataComponents;
 import com.pockyl.lumen_rigs.registry.ModItems;
+import com.pockyl.lumen_rigs.registry.ModParticles;
 import com.pockyl.lumen_rigs.registry.PockyModsTab;
 
 @Mod(LumenRigs.MOD_ID)
@@ -28,11 +29,13 @@ public final class LumenRigs {
         ModItems.register(modBus);
         ModBlockEntities.register(modBus);
         ModDataComponents.register(modBus);
+        ModParticles.register(modBus);
         PockyModsTab.register(modBus, () -> new ItemStack(ModItems.SPOTLIGHT.get()), output -> {
             output.accept(ModItems.SPOTLIGHT.get());
             output.accept(ModItems.FLOODLIGHT.get());
             output.accept(ModItems.SEARCHLIGHT.get());
             output.accept(ModItems.SOFT_PANEL.get());
+            output.accept(ModItems.HAZE_MACHINE.get());
             output.accept(ModItems.LIGHTING_REMOTE.get());
         });
         modBus.addListener(LumenRigs::addToVanillaTabs);
@@ -52,6 +55,7 @@ public final class LumenRigs {
             event.accept(ModItems.FLOODLIGHT.get());
             event.accept(ModItems.SEARCHLIGHT.get());
             event.accept(ModItems.SOFT_PANEL.get());
+            event.accept(ModItems.HAZE_MACHINE.get());
         } else if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModItems.LIGHTING_REMOTE.get());
         }

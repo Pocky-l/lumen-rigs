@@ -41,6 +41,35 @@ public enum FixtureType implements StringRepresentable {
         this.turnSpeed = turnSpeed;
     }
 
+    /** Shortest reach the player can set, in blocks. */
+    public int minRange() {
+        return switch (this) {
+            case SPOTLIGHT, FLOODLIGHT -> 8;
+            case SEARCHLIGHT -> 16;
+            case SOFT_PANEL -> 4;
+        };
+    }
+
+    /** Longest reach the player can set; a searchlight can reach far into the sky. */
+    public int maxRange() {
+        return switch (this) {
+            case SPOTLIGHT -> 64;
+            case FLOODLIGHT -> 48;
+            case SEARCHLIGHT -> 256;
+            case SOFT_PANEL -> 16;
+        };
+    }
+
+    /** How soft the edge of the light is by default: 0 a hard-edged profile spot, 1 fully diffuse. */
+    public float defaultSoftness() {
+        return switch (this) {
+            case SPOTLIGHT -> 0.3F;
+            case FLOODLIGHT -> 0.7F;
+            case SEARCHLIGHT -> 0.15F;
+            case SOFT_PANEL -> 1.0F;
+        };
+    }
+
     /** Whether the head can be turned; a soft panel always shines straight out of its mount face. */
     public boolean aimable() {
         return aimable;

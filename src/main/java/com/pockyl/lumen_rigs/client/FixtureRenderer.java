@@ -35,6 +35,7 @@ import org.joml.Vector3f;
 import com.pockyl.lumen_rigs.Config;
 import com.pockyl.lumen_rigs.LumenRigs;
 import com.pockyl.lumen_rigs.block.FixtureBlockEntity;
+import com.pockyl.lumen_rigs.client.light.Atmosphere;
 import com.pockyl.lumen_rigs.client.light.ClientLighting;
 import com.pockyl.lumen_rigs.fixture.Aim;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
@@ -140,13 +141,14 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
         // Veil scatters the light in the air itself (volumetric beams); the strips are the fallback.
         if (Config.beams() && !ClientLighting.useVeil()) {
             double half = Math.toRadians(fixture.settings().beam() / 2);
-            double length = beamLength(level, lens, direction, type.range());
+            double length = beamLength(level, lens, direction, fixture.settings().range());
             // Narrow beams concentrate their light; wide ones spread it thin.
             float density = (float) Mth.clamp(18.0 / fixture.settings().beam(), 0.35, 1.8);
             // Looking down the beam it would only be a thin sliver; fade it there, the flare takes over.
             float sideways = (float) Mth.clamp((1 - facing) * 3, 0.15, 1);
             VertexConsumer beam = buffers.getBuffer(BEAM);
-            float alpha = 0.32F * visibility * density * sideways;
+            float haze = fixture.settings().haze() * Atmosphere.scattering(level, lens);
+            float alpha = 0.32F * visibility * density * sideways * haze;
             strip(beam, matrix, origin, lens, direction, camera, length, half, type.lensRadius(), 0.45, alpha, r, g, b);
             strip(beam, matrix, origin, lens, direction, camera, length, half, type.lensRadius(), 1.0, alpha * 0.45F, r, g, b);
         }
@@ -250,6 +252,6 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
     /** The beam reaches far beyond the block. */
     @Override
     public AABB getRenderBoundingBox(FixtureBlockEntity fixture) {
-        return new AABB(fixture.getBlockPos()).inflate(fixture.type().range());
+        return new AABB(fixture.getBlockPos()).inflate(fixture.settings().range());
     }
 }

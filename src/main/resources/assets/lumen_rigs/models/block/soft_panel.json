@@ -7,6 +7,7 @@
     "fins": "lumen_rigs:block/fins",
     "bezel": "lumen_rigs:block/bezel",
     "led": "lumen_rigs:block/led",
+    "grille": "lumen_rigs:block/grille",
     "particle": "lumen_rigs:block/housing"
   },
   "elements": [
