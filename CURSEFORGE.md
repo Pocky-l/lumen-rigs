@@ -2,6 +2,10 @@
 
 Aimable spotlights, floodlights, searchlights and soft panels with colored light and visible beams.
 
+![Colored beams in the night sky: colors mix like light](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/screenshots/color-mixing.jpg)
+
+*Colored beams in the night sky: colors mix like light*
+
 ## Features
 
 - **Four fixtures** on motorized yokes that turn smoothly to their aim:
@@ -47,6 +51,12 @@ built-in light: the game keeps working and the fixtures and beams still show, bu
 
 [NeoForge](https://neoforged.net) 1.21.1. Needed on both the client and the server.
 Optional: [Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib) for realistic per-pixel lighting.
+
+## Screenshots
+
+![Spotlights on glass stands lighting a block at dusk](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/screenshots/spotlights.jpg)
+
+*Spotlights on glass stands lighting a block at dusk*
 
 ## Credits
 
