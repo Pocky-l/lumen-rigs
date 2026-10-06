@@ -84,7 +84,7 @@ Client config (`config/lumen_rigs-client.toml`):
 | `beams` | true | draw visible beams |
 | `beamStrength` | 1.0 | how visible the beams are |
 | `lighting` | true | let fixtures light up blocks and mobs |
-| `lightingEngine` | AUTO | `AUTO` uses Veil when installed, `BLOCK_LIGHT` always uses the built-in light |
+| `lightingEngine` | AUTO | `AUTO` uses Veil when installed (and Iris is not), `BLOCK_LIGHT` always uses the built-in light |
 | `colorStrength` | 1.0 | how strongly colored light tints what it hits |
 | `maxLights` | 48 | how many of the nearest fixtures light up the world at once |
 
@@ -95,9 +95,11 @@ mods, and it does not stop mobs from spawning.
 
 - With [Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib) installed, the light is drawn by Veil's deferred
   renderer. If Veil fails at runtime, the mod falls back to its own light by itself.
-- The built-in light hooks into Minecraft's block and entity rendering; mods that replace the chunk renderer (such as
-  Sodium or Embeddium) bypass it — the game keeps working, the fixtures and beams still show, but blocks are not lit.
-  The game log says which light hooks are active.
+- [Iris](https://modrinth.com/mod/iris): Veil turns its lights off whenever Iris is installed, so with Iris the mod
+  uses its built-in light and beams, also when Veil is installed.
+- The built-in light works with vanilla rendering and with [Sodium](https://modrinth.com/mod/sodium) (colored too).
+  Other chunk renderers (such as Embeddium) bypass it — the game keeps working, the fixtures and beams still show, but
+  blocks are not lit. The game log says which light hooks are active.
 
 ## Installation
 

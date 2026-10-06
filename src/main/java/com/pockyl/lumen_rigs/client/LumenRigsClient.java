@@ -31,9 +31,11 @@ public final class LumenRigsClient {
         modBus.addListener(LumenRigsClient::registerModels);
         modBus.addListener(LumenRigsClient::registerBlockColors);
         modBus.addListener((FMLClientSetupEvent event) -> MixinCheck.log());
-        if (ClientLighting.veilLoaded()) {
+        if (ClientLighting.veilUsable()) {
             // Only touched when Veil is installed, so its classes are never needed otherwise.
             VeilFixtureLights.register();
+        } else if (ClientLighting.veilLoaded()) {
+            LumenRigs.LOGGER.info("Veil found, but Iris is installed and Veil turns its lights off then: using the built-in light");
         }
     }
 

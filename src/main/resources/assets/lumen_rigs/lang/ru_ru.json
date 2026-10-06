@@ -63,7 +63,7 @@
   "lumen_rigs.configuration.maxLights": "Максимум источников",
   "lumen_rigs.configuration.maxLights.tooltip": "Сколько ближайших приборов одновременно освещают мир. Движущийся свет перерисовывает чанки, на слабых компьютерах уменьшите.",
   "lumen_rigs.configuration.lightingEngine": "Движок освещения",
-  "lumen_rigs.configuration.lightingEngine.tooltip": "AUTO — попиксельный свет Veil (с тенями и объёмными лучами), если Veil установлен, иначе встроенный блочный свет. BLOCK_LIGHT — всегда встроенный.",
+  "lumen_rigs.configuration.lightingEngine.tooltip": "AUTO — попиксельный свет Veil (с тенями и объёмными лучами), если Veil установлен, а Iris нет (с Iris Veil выключает свой свет), иначе встроенный блочный свет. BLOCK_LIGHT — всегда встроенный.",
   "lumen_rigs.screen.section.aim": "Наведение",
   "lumen_rigs.screen.section.light": "Свет",
   "lumen_rigs.screen.beam.hint": "Насколько широк конус света.",

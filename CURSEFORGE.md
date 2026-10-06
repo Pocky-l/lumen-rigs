@@ -38,8 +38,10 @@ Use JEI or the recipe book for the exact shapes.
 ## Compatibility
 
 The light is client-side: nothing is placed in the world, so it is safe for servers and other mods, and it does not
-stop mobs from spawning. Without Veil, mods that replace the chunk renderer (Sodium, Embeddium) bypass the built-in
-light: the game keeps working and the fixtures and beams still show, but blocks are not lit.
+stop mobs from spawning. The built-in light works with vanilla rendering and with
+[Sodium](https://modrinth.com/mod/sodium). Veil turns its lights off when [Iris](https://modrinth.com/mod/iris) is
+installed, so with Iris the built-in light and beams are used. Other chunk renderers (such as Embeddium) bypass the
+built-in light: the game keeps working and the fixtures and beams still show, but blocks are not lit.
 
 ## Requirements
 

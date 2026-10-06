@@ -30,6 +30,13 @@ repositories {
             includeGroup('io.github.ocelot')
         }
     }
+    maven {
+        name = 'CaffeineMC (Sodium)'
+        url = 'https://maven.caffeinemc.net/releases'
+        content {
+            includeGroup('net.caffeinemc')
+        }
+    }
 }
 
 neoForge {
@@ -88,6 +95,8 @@ dependencies {
     // Optional: with Veil installed, fixtures use its deferred lighting (per-pixel light, shadows, volumetric beams).
     compileOnly "foundry.veil:veil-neoforge-${minecraft_version}:${veil_version}"
     localRuntime "foundry.veil:veil-neoforge-${minecraft_version}:${veil_version}"
+    // Optional: with Sodium installed, its chunk mesher gets the colored fixture light too (mixins/sodium).
+    compileOnly("net.caffeinemc:sodium-neoforge-mod:${sodium_version}") { transitive = false }
 }
 
 var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {

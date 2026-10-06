@@ -18,6 +18,9 @@ import java.util.List;
 public final class ClientLighting {
     public static final String VEIL = "veil";
     private static final boolean VEIL_LOADED = ModList.get().isLoaded(VEIL);
+    // Veil switches its dynamic buffers off whenever Iris is installed (even without a shader pack), so its lights
+    // never show then. Oculus is the Forge port of Iris.
+    private static final boolean IRIS_LOADED = ModList.get().isLoaded("iris") || ModList.get().isLoaded("oculus");
     private static boolean veilFailed;
 
     private ClientLighting() {
@@ -27,9 +30,14 @@ public final class ClientLighting {
         return VEIL_LOADED;
     }
 
+    /** Whether Veil's lights can show at all: Veil is installed and Iris is not. */
+    public static boolean veilUsable() {
+        return VEIL_LOADED && !IRIS_LOADED;
+    }
+
     /** Whether Veil draws the light (and the volumetric beams) instead of the block-light engine. */
     public static boolean useVeil() {
-        return VEIL_LOADED && !veilFailed && Config.lighting() && Config.lightingEngine() == Config.LightingEngine.AUTO;
+        return veilUsable() && !veilFailed && Config.lighting() && Config.lightingEngine() == Config.LightingEngine.AUTO;
     }
 
     /** Called when Veil's lights fail at runtime: the block-light engine takes over for the rest of the session. */

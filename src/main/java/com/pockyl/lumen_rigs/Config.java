@@ -31,8 +31,8 @@ public final class Config {
             .translation("lumen_rigs.configuration.lighting")
             .define("lighting", true);
     private static final ModConfigSpec.EnumValue<LightingEngine> LIGHTING_ENGINE = CLIENT
-            .comment("AUTO uses Veil's per-pixel lights (with shadows and volumetric beams) when Veil is installed, otherwise",
-                    "the built-in block light. BLOCK_LIGHT always uses the built-in one.")
+            .comment("AUTO uses Veil's per-pixel lights (with shadows and volumetric beams) when Veil is installed and Iris is not",
+                    "(Veil turns its lights off with Iris), otherwise the built-in block light. BLOCK_LIGHT always uses the built-in one.")
             .translation("lumen_rigs.configuration.lightingEngine")
             .defineEnum("lightingEngine", LightingEngine.AUTO);
     private static final ModConfigSpec.DoubleValue COLOR_STRENGTH = CLIENT

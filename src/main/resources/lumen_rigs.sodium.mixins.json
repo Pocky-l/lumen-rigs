@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.pockyl.lumen_rigs.mixin.sodium",
+  "plugin": "com.pockyl.lumen_rigs.mixin.sodium.SodiumMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "SodiumBlockRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

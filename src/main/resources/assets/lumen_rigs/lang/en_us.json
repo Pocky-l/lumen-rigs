@@ -63,7 +63,7 @@
   "lumen_rigs.configuration.maxLights": "Max lights",
   "lumen_rigs.configuration.maxLights.tooltip": "At most this many fixtures (the nearest ones) light up the world at once. Moving lights re-render the chunks they reach, so lower this on weak computers.",
   "lumen_rigs.configuration.lightingEngine": "Lighting engine",
-  "lumen_rigs.configuration.lightingEngine.tooltip": "AUTO uses Veil's per-pixel lights (with shadows and volumetric beams) when Veil is installed, otherwise the built-in block light. BLOCK_LIGHT always uses the built-in one.",
+  "lumen_rigs.configuration.lightingEngine.tooltip": "AUTO uses Veil's per-pixel lights (with shadows and volumetric beams) when Veil is installed and Iris is not (Veil turns its lights off with Iris), otherwise the built-in block light. BLOCK_LIGHT always uses the built-in one.",
   "lumen_rigs.screen.section.aim": "Aim",
   "lumen_rigs.screen.section.light": "Light",
   "lumen_rigs.screen.beam.hint": "How wide the cone of light is.",
