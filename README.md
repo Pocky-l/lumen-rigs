@@ -40,7 +40,8 @@
 - **Settings screen** — right-click a fixture. *Aim*: mode (manual, point, follow, sweep), pan, tilt, beam angle,
   sweep width and speed, "Aim at me". *Light*: brightness (dimmer), **power** (25–400%), **softness** (from a crisp
   hard-edged spot to soft diffuse light), **range** (a searchlight reaches 256 blocks into the sky), **beam
-  visibility** in the air, redstone mode, and the color. Every change shows instantly.
+  visibility** in the air, redstone mode, and the color. Every change shows instantly. **Copy** and **Paste** carry
+  all settings, aim included, over to other fixtures — handy for a row of matching lights.
 - **Atmosphere** — beams show more in rain, thunderstorms and under water, like real ones.
 - **Redstone** — ignore it, turn on or off with a signal, or use the signal strength as a dimmer.
 
@@ -54,6 +55,7 @@
 | Follow a mob or player | *Use* the remote on it |
 | Shine where you look | *Use* the remote into the air |
 | Forget all links | *Sneak* + *Use* the remote into the air |
+| Copy a fixture's settings to another | *Copy* in its settings, then *Paste* in the other's |
 
 ## Crafting
 

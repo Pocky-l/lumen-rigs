@@ -132,6 +132,26 @@ public final class ModGameTests {
         helper.succeed();
     }
 
+    @GameTest(template = "empty", batch = "pastedSettingsCopyEverything")
+    public static void pastedSettingsCopyEverything(GameTestHelper helper) {
+        FixtureSettings source = FixtureSettings.defaults(FixtureType.SPOTLIGHT).withColor(0xFF2A1E).withBrightness(9).withPower(2.5F)
+                .withSoftness(0.8F).withHaze(2.0F).withRedstone(RedstoneMode.DIMMER).withBeam(12).withRange(20)
+                .withAim(170, -60, AimMode.SWEEP);
+
+        FixtureSettings pasted = FixtureSettings.paste(source, FixtureType.SPOTLIGHT);
+        helper.assertTrue(pasted.equals(source), "a fixture of the same kind gets every setting");
+
+        FixtureSettings onFlood = FixtureSettings.paste(source, FixtureType.FLOODLIGHT);
+        helper.assertTrue(onFlood.pan() == 170 && onFlood.tilt() == -60 && onFlood.mode() == AimMode.SWEEP, "the aim is pasted");
+        helper.assertTrue(onFlood.color() == 0xFF2A1E && onFlood.power() == 2.5F, "the look is pasted");
+        helper.assertTrue(onFlood.beam() == FixtureType.FLOODLIGHT.minBeam(), "a too narrow beam is widened to what a floodlight can do");
+
+        FixtureSettings pointing = source.withMode(AimMode.POINT);
+        helper.assertTrue(FixtureSettings.paste(pointing, FixtureType.SPOTLIGHT).mode() == AimMode.MANUAL,
+                "a point aim becomes a manual aim in the same direction");
+        helper.succeed();
+    }
+
     @GameTest(template = "empty", batch = "remoteLinksAimsAndFollows")
     public static void remoteLinksAimsAndFollows(GameTestHelper helper) {
         FixtureBlockEntity first = place(helper, new BlockPos(1, 2, 1), ModBlocks.SPOTLIGHT.get().defaultBlockState());

@@ -25,7 +25,8 @@ Aimable spotlights, floodlights, searchlights and soft panels with colored light
   you look. Linked fixtures are outlined while you hold it.
 - **Settings screen** (right-click a fixture): aim mode (manual, point, follow, sweep), pan, tilt, beam angle, sweep,
   "Aim at me"; brightness, **power** (25–400%), **softness** (crisp spot to diffuse light), **range** (searchlights
-  reach 256 blocks into the sky), **beam visibility**, redstone mode and color. Changes show instantly.
+  reach 256 blocks into the sky), **beam visibility**, redstone mode and color. Changes show instantly. **Copy** and
+  **Paste** carry all settings, aim included, over to other fixtures.
 - **Atmosphere**: beams show more in rain, storms and under water.
 - **Redstone**: ignore it, switch with a signal, or use the signal strength as a dimmer.
 

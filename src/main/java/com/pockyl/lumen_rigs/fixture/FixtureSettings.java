@@ -126,6 +126,16 @@ public record FixtureSettings(float pan, float tilt, float beam, int brightness,
         return new FixtureSettings(pan, tilt, beam, brightness, color, mode, redstone, sweepWidth, sweepSpeed, power, softness, haze, newRange);
     }
 
+    /**
+     * Everything of {@code copied}, fitted to a fixture of type {@code to}: values outside its ranges (beam angle,
+     * range) are clamped. Point and follow aims depend on a target the copy does not carry, so they become a manual
+     * aim in the same direction.
+     */
+    public static FixtureSettings paste(FixtureSettings copied, FixtureType to) {
+        AimMode pastedMode = copied.mode == AimMode.SWEEP ? AimMode.SWEEP : AimMode.MANUAL;
+        return copied.withMode(pastedMode).clamp(to);
+    }
+
     public CompoundTag save() {
         CompoundTag tag = new CompoundTag();
         tag.putFloat("Pan", pan);

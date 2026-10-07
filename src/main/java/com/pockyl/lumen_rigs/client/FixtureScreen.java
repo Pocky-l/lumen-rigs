@@ -14,6 +14,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 
 import com.pockyl.lumen_rigs.block.FixtureBlockEntity;
 import com.pockyl.lumen_rigs.fixture.Aim;
@@ -40,6 +41,10 @@ public final class FixtureScreen extends Screen {
     private static final int[] PALETTE = {
             0xF4F6FF, 0xFF7A12, 0xFF3CE6, 0x4FC3FF, 0xFFE12A, 0x9BFF2A, 0xFF7AB8, 0x8C96AA,
             0xC4CCDC, 0x1EE6D8, 0x9B3CFF, 0x2E62FF, 0xE08A2E, 0x2EE84A, 0xFF2A1E, 0x6A2CFF};
+
+    /** Settings copied with the Copy button, kept for the game session. */
+    @Nullable
+    private static FixtureSettings clipboard;
 
     private final FixtureBlockEntity fixture;
     private FixtureSettings settings;
@@ -97,9 +102,25 @@ public final class FixtureScreen extends Screen {
                 .bounds(left + width - 80, hueY, 80, 20)
                 .build());
 
-        addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> onClose())
-                .bounds(this.width / 2 - 50, hueY + ROW + 6, 100, 20)
+        int bottomY = hueY + ROW + 6;
+        addRenderableWidget(Button.builder(Component.translatable("lumen_rigs.screen.copy"), button -> {
+                    clipboard = settings;
+                    rebuildWidgets();
+                })
+                .bounds(this.width / 2 - 50 - 4 - 70, bottomY, 70, 20)
+                .tooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.copy.hint")))
                 .build());
+        addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> onClose())
+                .bounds(this.width / 2 - 50, bottomY, 100, 20)
+                .build());
+        Button paste = addRenderableWidget(Button.builder(Component.translatable("lumen_rigs.screen.paste"), button -> {
+                    update(FixtureSettings.paste(clipboard, fixture.type()));
+                    rebuildWidgets();
+                })
+                .bounds(this.width / 2 + 50 + 4, bottomY, 70, 20)
+                .tooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.paste.hint")))
+                .build());
+        paste.active = clipboard != null;
     }
 
     /** Left column: where the fixture points. */
