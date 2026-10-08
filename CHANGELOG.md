@@ -4,7 +4,7 @@ All notable changes to this mod are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.0+1.20.1] - Unreleased
+## [1.1.0+1.20.1] - 2026-10-08
 ### Added
 - Ported to Minecraft 1.20.1 (Forge). It also runs on NeoForge for 1.20.1.
 - The built-in light is colored with [Embeddium](https://www.curseforge.com/minecraft/mc-mods/embeddium) installed.
