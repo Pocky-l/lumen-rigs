@@ -12,16 +12,16 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import com.pockyl.lumen_rigs.LumenRigs;
 import com.pockyl.lumen_rigs.item.LightingRemoteItem;
 
 /** While a lighting remote is held, its linked fixtures are outlined, so it is clear what it will move. */
-@EventBusSubscriber(modid = LumenRigs.MOD_ID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = LumenRigs.MOD_ID, value = Dist.CLIENT)
 public final class RemoteOverlay {
     private static final double MAX_DISTANCE = 128;
 
@@ -46,7 +46,7 @@ public final class RemoteOverlay {
         PoseStack pose = event.getPoseStack();
         MultiBufferSource.BufferSource buffers = minecraft.renderBuffers().bufferSource();
         VertexConsumer lines = buffers.getBuffer(RenderType.lines());
-        float pulse = 0.65F + 0.35F * (float) Math.sin((player.tickCount + event.getPartialTick().getGameTimeDeltaPartialTick(false)) * 0.2);
+        float pulse = 0.65F + 0.35F * (float) Math.sin((player.tickCount + event.getPartialTick()) * 0.2);
         for (GlobalPos link : LightingRemoteItem.links(remote)) {
             if (link.dimension() != player.level().dimension() || link.pos().getCenter().distanceTo(camera) > MAX_DISTANCE) {
                 continue;

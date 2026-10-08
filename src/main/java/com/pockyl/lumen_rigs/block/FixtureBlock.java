@@ -3,6 +3,7 @@ package com.pockyl.lumen_rigs.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -25,10 +26,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import com.pockyl.lumen_rigs.fixture.FixtureType;
+import com.pockyl.lumen_rigs.network.ModNetwork;
 import com.pockyl.lumen_rigs.network.OpenFixturePayload;
 import com.pockyl.lumen_rigs.registry.ModBlockEntities;
 
@@ -72,36 +73,40 @@ public final class FixtureBlock extends Block implements EntityBlock {
     }
 
     @Override
-    protected BlockState rotate(BlockState state, Rotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
-    protected BlockState mirror(BlockState state, Mirror mirror) {
+    public BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return shapes.get(state.getValue(FACING));
     }
 
     /** The soft panel is a normal block model; the other fixtures move, so their renderer draws them. */
     @Override
-    protected RenderShape getRenderShape(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         return type == FixtureType.SOFT_PANEL ? RenderShape.MODEL : RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
+    // Only the main hand opens the screen, so the off hand does not open it a second time.
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (hand != InteractionHand.MAIN_HAND) {
+            return InteractionResult.PASS;
+        }
         if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof FixtureBlockEntity) {
-            PacketDistributor.sendToPlayer(serverPlayer, new OpenFixturePayload(pos));
+            ModNetwork.sendToPlayer(serverPlayer, new OpenFixturePayload(pos));
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighbor, BlockPos neighborPos, boolean moved) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighbor, BlockPos neighborPos, boolean moved) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof FixtureBlockEntity fixture) {
             fixture.setSignal(level.getBestNeighborSignal(pos));
         }

@@ -13,10 +13,10 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import com.pockyl.lumen_rigs.Config;
 import com.pockyl.lumen_rigs.LumenRigs;
@@ -38,7 +38,7 @@ import java.util.Map;
  * changes, only the chunk sections whose light actually changed are re-meshed. Meshing runs on worker threads, so the
  * lights are published as an immutable snapshot.
  */
-@EventBusSubscriber(modid = LumenRigs.MOD_ID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = LumenRigs.MOD_ID, value = Dist.CLIENT)
 public final class FixtureLights {
     /** Re-cast a still fixture this often, to notice placed or broken blocks. */
     private static final int REFRESH_INTERVAL = 40;
@@ -187,7 +187,10 @@ public final class FixtureLights {
 
     // Never let the light break the game: on any error the lights are dropped and the problem is logged once.
     @SubscribeEvent
-    public static void onClientTick(ClientTickEvent.Post event) {
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
         try {
             update();
         } catch (RuntimeException e) {
@@ -211,8 +214,7 @@ public final class FixtureLights {
         if (level == null) {
             return;
         }
-        // With Veil the light is drawn per pixel instead; the block light then stays vanilla.
-        List<FixtureBlockEntity> active = Config.lighting() && !ClientLighting.useVeil()
+        List<FixtureBlockEntity> active = Config.lighting()
                 ? ClientLighting.activeFixtures(level, minecraft.gameRenderer.getMainCamera().getPosition())
                 : List.of();
         long time = level.getGameTime();

@@ -3,7 +3,6 @@ package com.pockyl.lumen_rigs.client.light;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.FastColor;
 
 /**
  * Passes one block quad through to the chunk mesh with each vertex's color multiplied by the fixture light reaching
@@ -39,49 +38,61 @@ public final class TintingConsumer implements VertexConsumer {
     }
 
     @Override
-    public void addVertex(float x, float y, float z, int color, float u, float v, int packedOverlay, int packedLight, float normalX,
-            float normalY, float normalZ) {
+    public void vertex(float x, float y, float z, float red, float green, float blue, float alpha, float u, float v, int packedOverlay,
+            int packedLight, float normalX, float normalY, float normalZ) {
         int i = Math.min(vertex++, 3) * 3;
-        int tinted = FastColor.ARGB32.color(FastColor.ARGB32.alpha(color),
-                (int) (FastColor.ARGB32.red(color) * tints[i]),
-                (int) (FastColor.ARGB32.green(color) * tints[i + 1]),
-                (int) (FastColor.ARGB32.blue(color) * tints[i + 2]));
-        delegate.addVertex(x, y, z, tinted, u, v, packedOverlay, packedLight, normalX, normalY, normalZ);
+        delegate.vertex(x, y, z, red * tints[i], green * tints[i + 1], blue * tints[i + 2], alpha, u, v, packedOverlay, packedLight,
+                normalX, normalY, normalZ);
     }
 
     @Override
-    public VertexConsumer addVertex(float x, float y, float z) {
-        delegate.addVertex(x, y, z);
+    public VertexConsumer vertex(double x, double y, double z) {
+        delegate.vertex(x, y, z);
         return this;
     }
 
     @Override
-    public VertexConsumer setColor(int red, int green, int blue, int alpha) {
-        delegate.setColor(red, green, blue, alpha);
+    public VertexConsumer color(int red, int green, int blue, int alpha) {
+        delegate.color(red, green, blue, alpha);
         return this;
     }
 
     @Override
-    public VertexConsumer setUv(float u, float v) {
-        delegate.setUv(u, v);
+    public VertexConsumer uv(float u, float v) {
+        delegate.uv(u, v);
         return this;
     }
 
     @Override
-    public VertexConsumer setUv1(int u, int v) {
-        delegate.setUv1(u, v);
+    public VertexConsumer overlayCoords(int u, int v) {
+        delegate.overlayCoords(u, v);
         return this;
     }
 
     @Override
-    public VertexConsumer setUv2(int u, int v) {
-        delegate.setUv2(u, v);
+    public VertexConsumer uv2(int u, int v) {
+        delegate.uv2(u, v);
         return this;
     }
 
     @Override
-    public VertexConsumer setNormal(float normalX, float normalY, float normalZ) {
-        delegate.setNormal(normalX, normalY, normalZ);
+    public VertexConsumer normal(float normalX, float normalY, float normalZ) {
+        delegate.normal(normalX, normalY, normalZ);
         return this;
+    }
+
+    @Override
+    public void endVertex() {
+        delegate.endVertex();
+    }
+
+    @Override
+    public void defaultColor(int red, int green, int blue, int alpha) {
+        delegate.defaultColor(red, green, blue, alpha);
+    }
+
+    @Override
+    public void unsetDefaultColor() {
+        delegate.unsetDefaultColor();
     }
 }

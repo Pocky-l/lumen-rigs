@@ -2,7 +2,6 @@ package com.pockyl.lumen_rigs.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -15,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -258,8 +258,8 @@ public final class FixtureBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         tag.put("Settings", settings.save());
         if (targetPoint != null) {
             tag.putDouble("TargetX", targetPoint.x);
@@ -273,8 +273,8 @@ public final class FixtureBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         settings = FixtureSettings.load(tag.getCompound("Settings"), type());
         targetPoint = tag.contains("TargetX") ? new Vec3(tag.getDouble("TargetX"), tag.getDouble("TargetY"), tag.getDouble("TargetZ")) : null;
         followUuid = tag.hasUUID("Follow") ? tag.getUUID("Follow") : null;
@@ -287,8 +287,8 @@ public final class FixtureBlockEntity extends BlockEntity {
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = saveWithoutMetadata(registries);
+    public CompoundTag getUpdateTag() {
+        CompoundTag tag = saveWithoutMetadata();
         tag.putInt("FollowId", followId);
         return tag;
     }
@@ -296,5 +296,11 @@ public final class FixtureBlockEntity extends BlockEntity {
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    /** The beam reaches far beyond the block. */
+    @Override
+    public AABB getRenderBoundingBox() {
+        return new AABB(worldPosition).inflate(settings.range());
     }
 }

@@ -3,15 +3,15 @@ package com.pockyl.lumen_rigs.client.light;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.neoforged.fml.ModList;
+import net.minecraftforge.fml.ModList;
 
 import com.pockyl.lumen_rigs.LumenRigs;
 
 import java.lang.reflect.Method;
 
 /**
- * The light hooks are optional (another mod may replace the same rendering code, e.g. a chunk renderer like Embeddium),
- * so a missing hook never crashes the game. This logs which hooks are active, to explain a missing light or color.
+ * The light hooks are optional (another mod may replace the same rendering code, e.g. another chunk renderer), so a
+ * missing hook never crashes the game. This logs which hooks are active, to explain a missing light or color.
  */
 public final class MixinCheck {
     private MixinCheck() {
@@ -21,11 +21,12 @@ public final class MixinCheck {
         report("block light", LevelRenderer.class);
         report("block color", ModelBlockRenderer.class);
         report("entity light", EntityRenderer.class);
-        if (ModList.get().isLoaded("sodium")) {
+        if (ModList.get().isLoaded("embeddium")) {
             try {
-                report("Sodium block color", Class.forName("net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.BlockRenderer"));
+                report("Embeddium block color",
+                        Class.forName("me.jellysquid.mods.sodium.client.render.chunk.compile.pipeline.BlockRenderer"));
             } catch (ClassNotFoundException e) {
-                LumenRigs.LOGGER.warn("Sodium is installed, but its block renderer was not found; the light stays uncolored");
+                LumenRigs.LOGGER.warn("Embeddium is installed, but its block renderer was not found; the light stays uncolored");
             }
         }
     }

@@ -3,19 +3,18 @@ package com.pockyl.lumen_rigs.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 import com.pockyl.lumen_rigs.LumenRigs;
 import com.pockyl.lumen_rigs.block.FixtureBlock;
@@ -156,7 +155,7 @@ public final class ModGameTests {
     public static void remoteLinksAimsAndFollows(GameTestHelper helper) {
         FixtureBlockEntity first = place(helper, new BlockPos(1, 2, 1), ModBlocks.SPOTLIGHT.get().defaultBlockState());
         FixtureBlockEntity second = place(helper, new BlockPos(3, 2, 1), ModBlocks.FLOODLIGHT.get().defaultBlockState());
-        Player player = helper.makeMockPlayer(GameType.CREATIVE);
+        Player player = helper.makeMockPlayer();
         player.moveTo(helper.absoluteVec(new Vec3(2, 2, 3)));
         ItemStack remote = new ItemStack(ModItems.LIGHTING_REMOTE.get());
 

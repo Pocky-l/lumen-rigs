@@ -3,6 +3,9 @@ package com.pockyl.lumen_rigs.item;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -20,10 +23,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import com.pockyl.lumen_rigs.Config;
+import com.pockyl.lumen_rigs.LumenRigs;
 import com.pockyl.lumen_rigs.block.FixtureBlockEntity;
-import com.pockyl.lumen_rigs.registry.ModDataComponents;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +40,31 @@ import java.util.function.Consumer;
  */
 public final class LightingRemoteItem extends Item {
     public static final int MAX_LINKS = 64;
+    /** Item tag key of the fixtures a lighting remote controls. */
+    private static final String LINKS = "Links";
 
     public LightingRemoteItem(Properties properties) {
         super(properties);
     }
 
     public static List<GlobalPos> links(ItemStack stack) {
-        return stack.getOrDefault(ModDataComponents.LINKS.get(), List.of());
+        CompoundTag tag = stack.getTag();
+        if (tag == null || !tag.contains(LINKS, Tag.TAG_LIST)) {
+            return List.of();
+        }
+        return GlobalPos.CODEC.listOf().parse(NbtOps.INSTANCE, tag.get(LINKS))
+                .resultOrPartial(error -> LumenRigs.LOGGER.warn("Dropping unreadable remote links: {}", error))
+                .map(List::copyOf)
+                .orElse(List.of());
+    }
+
+    private static void setLinks(ItemStack stack, List<GlobalPos> links) {
+        if (links.isEmpty()) {
+            stack.removeTagKey(LINKS);
+            return;
+        }
+        GlobalPos.CODEC.listOf().encodeStart(NbtOps.INSTANCE, links).result()
+                .ifPresent(encoded -> stack.getOrCreateTag().put(LINKS, encoded));
     }
 
     /** Links the fixture if it is not linked yet, unlinks it otherwise; returns whether it is linked now. */
@@ -55,7 +77,7 @@ public final class LightingRemoteItem extends Item {
             }
             links.add(fixture);
         }
-        stack.set(ModDataComponents.LINKS.get(), List.copyOf(links));
+        setLinks(stack, links);
         return linked;
     }
 
@@ -124,7 +146,7 @@ public final class LightingRemoteItem extends Item {
             return InteractionResultHolder.success(stack);
         }
         if (player.isShiftKeyDown()) {
-            stack.remove(ModDataComponents.LINKS.get());
+            stack.removeTagKey(LINKS);
             feedback(player, "cleared", 0);
             beep(level, player, 0.8F);
             return InteractionResultHolder.success(stack);
@@ -165,7 +187,7 @@ public final class LightingRemoteItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.lumen_rigs.lighting_remote.links", links(stack).size()).withStyle(ChatFormatting.AQUA));
         for (int i = 1; i <= 4; i++) {
             tooltip.add(Component.translatable("item.lumen_rigs.lighting_remote.help" + i).withStyle(ChatFormatting.GRAY));
@@ -174,6 +196,8 @@ public final class LightingRemoteItem extends Item {
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        return !links(stack).isEmpty();
+        // Asked every frame the remote is drawn; an empty list is never stored, so the key alone tells.
+        CompoundTag tag = stack.getTag();
+        return tag != null && tag.contains(LINKS, Tag.TAG_LIST);
     }
 }

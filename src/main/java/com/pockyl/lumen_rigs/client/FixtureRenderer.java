@@ -7,7 +7,6 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
@@ -15,19 +14,17 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.minecraftforge.client.model.data.ModelData;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -36,7 +33,6 @@ import com.pockyl.lumen_rigs.Config;
 import com.pockyl.lumen_rigs.LumenRigs;
 import com.pockyl.lumen_rigs.block.FixtureBlockEntity;
 import com.pockyl.lumen_rigs.client.light.Atmosphere;
-import com.pockyl.lumen_rigs.client.light.ClientLighting;
 import com.pockyl.lumen_rigs.fixture.Aim;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
 
@@ -50,13 +46,7 @@ import java.util.Map;
  */
 public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEntity> {
     private static final ResourceLocation FLARE = LumenRigs.id("textures/misc/flare.png");
-    private static final RenderType BEAM = RenderType.create(LumenRigs.MOD_ID + "_beam", DefaultVertexFormat.POSITION_COLOR,
-            VertexFormat.Mode.QUADS, 4096, false, false, RenderType.CompositeState.builder()
-                    .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
-                    .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
-                    .setWriteMaskState(RenderStateShard.COLOR_WRITE)
-                    .setCullState(RenderStateShard.NO_CULL)
-                    .createCompositeState(false));
+    private static final RenderType BEAM = BeamType.create();
     private static final int BEAM_SEGMENTS = 14;
     private static final float OFF_LENS = 0.22F;
 
@@ -66,8 +56,8 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
     }
 
     /** The separately rendered parts of an aimable fixture, registered as additional models. */
-    public static ModelResourceLocation part(FixtureType type, String part) {
-        return ModelResourceLocation.standalone(LumenRigs.id("block/" + type.getSerializedName() + "_" + part));
+    public static ResourceLocation part(FixtureType type, String part) {
+        return LumenRigs.id("block/" + type.getSerializedName() + "_" + part);
     }
 
     @Override
@@ -112,7 +102,7 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
         }
     }
 
-    private static BakedModel model(ModelResourceLocation location) {
+    private static BakedModel model(ResourceLocation location) {
         return Minecraft.getInstance().getModelManager().getModel(location);
     }
 
@@ -138,8 +128,7 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
 
         Vec3 toCamera = camera.subtract(lens);
         double facing = toCamera.lengthSqr() < 1.0E-6 ? 0 : Math.max(0, toCamera.normalize().dot(direction));
-        // Veil scatters the light in the air itself (volumetric beams); the strips are the fallback.
-        if (Config.beams() && !ClientLighting.useVeil()) {
+        if (Config.beams()) {
             double half = Math.toRadians(fixture.settings().beam() / 2);
             double length = beamLength(level, lens, direction, fixture.settings().range());
             // Narrow beams concentrate their light; wide ones spread it thin.
@@ -167,7 +156,8 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
     /** How far the beam goes before it hits a block. */
     private static double beamLength(Level level, Vec3 lens, Vec3 direction, double range) {
         Vec3 end = lens.add(direction.scale(range));
-        BlockHitResult hit = level.clip(new ClipContext(lens, end, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, CollisionContext.empty()));
+        ClipContext context = new ClipContext(lens, end, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, (Entity) null);
+        BlockHitResult hit = level.clip(context);
         return hit.getType() == HitResult.Type.MISS ? range : hit.getLocation().distanceTo(lens);
     }
 
@@ -214,8 +204,9 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
     }
 
     private static void vertex(VertexConsumer consumer, Matrix4f matrix, BlockPos origin, Vec3 at, float r, float g, float b, float a) {
-        consumer.addVertex(matrix, (float) (at.x - origin.getX()), (float) (at.y - origin.getY()), (float) (at.z - origin.getZ()))
-                .setColor(r, g, b, Mth.clamp(a, 0, 1));
+        consumer.vertex(matrix, (float) (at.x - origin.getX()), (float) (at.y - origin.getY()), (float) (at.z - origin.getZ()))
+                .color(r, g, b, Mth.clamp(a, 0, 1))
+                .endVertex();
     }
 
     private static void flare(PoseStack pose, VertexConsumer consumer, float size, float r, float g, float b) {
@@ -227,12 +218,13 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
     }
 
     private static void flareVertex(VertexConsumer consumer, PoseStack.Pose last, float x, float y, float u, float v, float r, float g, float b) {
-        consumer.addVertex(last.pose(), x, y, 0)
-                .setColor(r, g, b, 1.0F)
-                .setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(LightTexture.FULL_BRIGHT)
-                .setNormal(last, 0, 1, 0);
+        consumer.vertex(last.pose(), x, y, 0)
+                .color(r, g, b, 1.0F)
+                .uv(u, v)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .normal(last.normal(), 0, 1, 0)
+                .endVertex();
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -249,9 +241,21 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
         return 160;
     }
 
-    /** The beam reaches far beyond the block. */
-    @Override
-    public AABB getRenderBoundingBox(FixtureBlockEntity fixture) {
-        return new AABB(fixture.getBlockPos()).inflate(fixture.settings().range());
+    /** The additive beam type; a subclass, because the render state shards it is built from are protected. */
+    private abstract static class BeamType extends RenderType {
+        private BeamType(String name, VertexFormat format, VertexFormat.Mode mode, int bufferSize, boolean affectsCrumbling,
+                boolean sortOnUpload, Runnable setupState, Runnable clearState) {
+            super(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload, setupState, clearState);
+        }
+
+        static RenderType create() {
+            return RenderType.create(LumenRigs.MOD_ID + "_beam", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 4096, false,
+                    false, RenderType.CompositeState.builder()
+                            .setShaderState(POSITION_COLOR_SHADER)
+                            .setTransparencyState(LIGHTNING_TRANSPARENCY)
+                            .setWriteMaskState(COLOR_WRITE)
+                            .setCullState(NO_CULL)
+                            .createCompositeState(false));
+        }
     }
 }

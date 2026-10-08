@@ -1,9 +1,7 @@
 package com.pockyl.lumen_rigs.fixture;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 
 /**
@@ -31,26 +29,6 @@ public record FixtureSettings(float pan, float tilt, float beam, int brightness,
     public static final float MIN_POWER = 0.25F;
     public static final float MAX_POWER = 4.0F;
     public static final float MAX_HAZE = 3.0F;
-
-    public static final StreamCodec<ByteBuf, FixtureSettings> STREAM_CODEC = StreamCodec.of(
-            (buf, settings) -> {
-                buf.writeFloat(settings.pan);
-                buf.writeFloat(settings.tilt);
-                buf.writeFloat(settings.beam);
-                ByteBufCodecs.VAR_INT.encode(buf, settings.brightness);
-                buf.writeInt(settings.color);
-                ByteBufCodecs.VAR_INT.encode(buf, settings.mode.ordinal());
-                ByteBufCodecs.VAR_INT.encode(buf, settings.redstone.ordinal());
-                buf.writeFloat(settings.sweepWidth);
-                buf.writeFloat(settings.sweepSpeed);
-                buf.writeFloat(settings.power);
-                buf.writeFloat(settings.softness);
-                buf.writeFloat(settings.haze);
-                buf.writeFloat(settings.range);
-            },
-            buf -> new FixtureSettings(buf.readFloat(), buf.readFloat(), buf.readFloat(), ByteBufCodecs.VAR_INT.decode(buf),
-                    buf.readInt(), AimMode.byId(ByteBufCodecs.VAR_INT.decode(buf)), RedstoneMode.byId(ByteBufCodecs.VAR_INT.decode(buf)),
-                    buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat()));
 
     public static FixtureSettings defaults(FixtureType type) {
         float tilt = type == FixtureType.SEARCHLIGHT ? 45 : -30;
@@ -134,6 +112,28 @@ public record FixtureSettings(float pan, float tilt, float beam, int brightness,
     public static FixtureSettings paste(FixtureSettings copied, FixtureType to) {
         AimMode pastedMode = copied.mode == AimMode.SWEEP ? AimMode.SWEEP : AimMode.MANUAL;
         return copied.withMode(pastedMode).clamp(to);
+    }
+
+    public void write(FriendlyByteBuf buf) {
+        buf.writeFloat(pan);
+        buf.writeFloat(tilt);
+        buf.writeFloat(beam);
+        buf.writeVarInt(brightness);
+        buf.writeInt(color);
+        buf.writeVarInt(mode.ordinal());
+        buf.writeVarInt(redstone.ordinal());
+        buf.writeFloat(sweepWidth);
+        buf.writeFloat(sweepSpeed);
+        buf.writeFloat(power);
+        buf.writeFloat(softness);
+        buf.writeFloat(haze);
+        buf.writeFloat(range);
+    }
+
+    public static FixtureSettings read(FriendlyByteBuf buf) {
+        return new FixtureSettings(buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readVarInt(), buf.readInt(),
+                AimMode.byId(buf.readVarInt()), RedstoneMode.byId(buf.readVarInt()), buf.readFloat(), buf.readFloat(), buf.readFloat(),
+                buf.readFloat(), buf.readFloat(), buf.readFloat());
     }
 
     public CompoundTag save() {

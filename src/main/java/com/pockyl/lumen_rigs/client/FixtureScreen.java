@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import com.pockyl.lumen_rigs.block.FixtureBlockEntity;
@@ -22,6 +21,7 @@ import com.pockyl.lumen_rigs.fixture.AimMode;
 import com.pockyl.lumen_rigs.fixture.FixtureSettings;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
 import com.pockyl.lumen_rigs.network.ConfigureFixturePayload;
+import com.pockyl.lumen_rigs.network.ModNetwork;
 
 import java.util.Locale;
 import java.util.function.DoubleConsumer;
@@ -222,7 +222,7 @@ public final class FixtureScreen extends Screen {
 
     private void send() {
         if (dirty) {
-            PacketDistributor.sendToServer(new ConfigureFixturePayload(fixture.getBlockPos(), settings));
+            ModNetwork.sendToServer(new ConfigureFixturePayload(fixture.getBlockPos(), settings));
             dirty = false;
             sinceSend = 0;
         }
@@ -254,6 +254,7 @@ public final class FixtureScreen extends Screen {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, partialTick);
         graphics.drawCenteredString(font, title, width / 2, top + 2, 0xFFFFFF);
         if (fixture.type().aimable()) {

@@ -19,11 +19,11 @@ import com.pockyl.lumen_rigs.client.light.TintingConsumer;
 abstract class ModelBlockRendererMixin {
     @WrapOperation(method = "putQuadData", at = @At(value = "INVOKE",
             target = "Lcom/mojang/blaze3d/vertex/VertexConsumer;putBulkData(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;"
-                    + "Lnet/minecraft/client/renderer/block/model/BakedQuad;[FFFFF[IIZ)V"))
+                    + "Lnet/minecraft/client/renderer/block/model/BakedQuad;[FFFF[IIZ)V"))
     private void lumen_rigs$tint(VertexConsumer consumer, PoseStack.Pose pose, BakedQuad quad, float[] brightness, float red,
-            float green, float blue, float alpha, int[] lightmap, int packedOverlay, boolean readAlpha, Operation<Void> original,
+            float green, float blue, int[] lightmap, int packedOverlay, boolean readAlpha, Operation<Void> original,
             BlockAndTintGetter level, BlockState state, BlockPos pos) {
-        original.call(TintingConsumer.wrap(consumer, pos, quad, lightmap), pose, quad, brightness, red, green, blue, alpha, lightmap,
+        original.call(TintingConsumer.wrap(consumer, pos, quad, lightmap), pose, quad, brightness, red, green, blue, lightmap,
                 packedOverlay, readAlpha);
     }
 }

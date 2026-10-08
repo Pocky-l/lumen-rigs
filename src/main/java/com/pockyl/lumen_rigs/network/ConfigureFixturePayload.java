@@ -1,35 +1,32 @@
 package com.pockyl.lumen_rigs.network;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.network.NetworkEvent;
 
-import com.pockyl.lumen_rigs.LumenRigs;
 import com.pockyl.lumen_rigs.block.FixtureBlockEntity;
 import com.pockyl.lumen_rigs.fixture.FixtureSettings;
 
+import java.util.function.Supplier;
+
 /** Client to server: new settings for a fixture, sent from its settings screen. */
-public record ConfigureFixturePayload(BlockPos pos, FixtureSettings settings) implements CustomPacketPayload {
-    public static final Type<ConfigureFixturePayload> TYPE = new Type<>(LumenRigs.id("configure_fixture"));
+public record ConfigureFixturePayload(BlockPos pos, FixtureSettings settings) {
     /** Players further away than this cannot change a fixture (blocks, squared). */
     private static final double MAX_DISTANCE_SQR = 12 * 12;
 
-    public static final StreamCodec<ByteBuf, ConfigureFixturePayload> STREAM_CODEC = StreamCodec.composite(
-            BlockPos.STREAM_CODEC, ConfigureFixturePayload::pos,
-            FixtureSettings.STREAM_CODEC, ConfigureFixturePayload::settings,
-            ConfigureFixturePayload::new);
-
-    @Override
-    public Type<ConfigureFixturePayload> type() {
-        return TYPE;
+    public void write(FriendlyByteBuf buf) {
+        buf.writeBlockPos(pos);
+        settings.write(buf);
     }
 
-    public static void handle(ConfigureFixturePayload payload, IPayloadContext context) {
-        Player player = context.player();
-        if (player.isSpectator() || !player.mayBuild() || player.distanceToSqr(payload.pos.getCenter()) > MAX_DISTANCE_SQR
+    public static ConfigureFixturePayload read(FriendlyByteBuf buf) {
+        return new ConfigureFixturePayload(buf.readBlockPos(), FixtureSettings.read(buf));
+    }
+
+    public static void handle(ConfigureFixturePayload payload, Supplier<NetworkEvent.Context> context) {
+        Player player = context.get().getSender();
+        if (player == null || player.isSpectator() || !player.mayBuild() || player.distanceToSqr(payload.pos.getCenter()) > MAX_DISTANCE_SQR
                 || !player.level().isLoaded(payload.pos)) {
             return;
         }
