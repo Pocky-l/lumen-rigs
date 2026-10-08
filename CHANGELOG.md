@@ -4,6 +4,17 @@ All notable changes to this mod are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0+1.20.1] - Unreleased
+### Added
+- Ported to Minecraft 1.20.1 (Forge). It also runs on NeoForge for 1.20.1.
+- The built-in light is colored with [Embeddium](https://www.curseforge.com/minecraft/mc-mods/embeddium) installed.
+
+### Changed
+- Fixtures always use the built-in light: the [Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib) lighting
+  (per-pixel light, shadows, volumetric beams) is only available on Minecraft 1.21.1. The `lightingEngine` option is
+  kept but has no effect.
+- The settings can only be changed in the config files, as Forge for 1.20.1 has no in-game config screen.
+
 ## [1.1.0] - 2026-10-07
 ### Added
 - Copy and Paste buttons in the fixture settings: copy every setting of one fixture (pan, tilt, beam angle, color,
