@@ -26,7 +26,8 @@ Aimable spotlights, floodlights, searchlights and soft panels with colored light
 - **Settings screen** (right-click a fixture): aim mode (manual, point, follow, sweep), pan, tilt, beam angle, sweep,
   "Aim at me"; brightness, **power** (25–400%), **softness** (crisp spot to diffuse light), **range** (searchlights
   reach 256 blocks into the sky), **beam visibility**, redstone mode and color. Changes show instantly. **Copy** and
-  **Paste** carry all settings, aim included, over to other fixtures.
+  **Paste** carry all settings, aim included, over to other fixtures, and **Apply to linked** gives them to every
+  fixture linked to your Lighting Remote at once, all aimed at the same spot or the same target.
 - **Atmosphere**: beams show more in rain, storms and under water.
 - **Redstone**: ignore it, switch with a signal, or use the signal strength as a dimmer.
 

@@ -100,6 +100,26 @@ public final class FixtureBlockEntity extends BlockEntity {
         changed();
     }
 
+    /**
+     * Takes over every setting of {@code source}, fitted to this kind of fixture. Unlike a paste, a point or follow aim
+     * keeps its target, so a whole rig ends up on the same spot or the same entity.
+     */
+    public void copyFrom(FixtureBlockEntity source) {
+        settings = source.settings.clamp(type());
+        targetPoint = source.targetPoint;
+        followUuid = source.followUuid;
+        followId = source.followId;
+        if (settings.mode() == AimMode.POINT && targetPoint != null) {
+            // Pan and tilt are what the fixture falls back to when switched to manual: keep them on the shared spot.
+            Vec3 offset = targetPoint.subtract(pivot());
+            if (offset.lengthSqr() > 1.0E-4) {
+                Vec3 direction = offset.normalize();
+                settings = settings.withAim(Aim.pan(direction), Aim.tilt(direction), AimMode.POINT).clamp(type());
+            }
+        }
+        changed();
+    }
+
     /** Points the fixture at a spot in the world and keeps it there. */
     public void aimAt(Vec3 point) {
         targetPoint = point;

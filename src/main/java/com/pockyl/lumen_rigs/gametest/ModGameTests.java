@@ -6,6 +6,7 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.entity.player.Player;
@@ -175,6 +176,46 @@ public final class ModGameTests {
 
         helper.assertFalse(LightingRemoteItem.toggleLink(remote, GlobalPos.of(helper.getLevel().dimension(), first.getBlockPos())), "unlinked again");
         helper.assertTrue(LightingRemoteItem.links(remote).size() == 1, "one link left");
+        cow.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", batch = "applyToLinkedCopiesTheLook")
+    public static void applyToLinkedCopiesTheLook(GameTestHelper helper) {
+        FixtureBlockEntity source = place(helper, new BlockPos(1, 2, 1), ModBlocks.SPOTLIGHT.get().defaultBlockState());
+        FixtureBlockEntity linked = place(helper, new BlockPos(3, 2, 1), ModBlocks.FLOODLIGHT.get().defaultBlockState());
+        FixtureBlockEntity unlinked = place(helper, new BlockPos(5, 2, 1), ModBlocks.SEARCHLIGHT.get().defaultBlockState());
+        FixtureSettings untouched = unlinked.settings();
+        Player player = helper.makeMockPlayer(GameType.CREATIVE);
+        player.moveTo(helper.absoluteVec(new Vec3(3, 2, 3)));
+        ItemStack remote = new ItemStack(ModItems.LIGHTING_REMOTE.get());
+        LightingRemoteItem.toggleLink(remote, GlobalPos.of(helper.getLevel().dimension(), source.getBlockPos()));
+        LightingRemoteItem.toggleLink(remote, GlobalPos.of(helper.getLevel().dimension(), linked.getBlockPos()));
+
+        source.applySettings(FixtureSettings.defaults(FixtureType.SPOTLIGHT).withColor(0x2EE84A).withBrightness(7).withPower(3)
+                .withBeam(10).withRange(60).withRedstone(RedstoneMode.DIMMER));
+        Vec3 target = helper.absoluteVec(new Vec3(3, 1, 8));
+        source.aimAt(target);
+
+        helper.assertTrue(LightingRemoteItem.applyToLinked(player, source) == 0, "nothing changes without a remote in hand");
+        player.setItemInHand(InteractionHand.OFF_HAND, remote);
+        helper.assertTrue(LightingRemoteItem.applyTargets(remote, player, source).size() == 1, "the open fixture is not a target");
+        helper.assertTrue(LightingRemoteItem.applyToLinked(player, source) == 1, "applied to the one other linked fixture");
+
+        FixtureSettings settings = linked.settings();
+        helper.assertTrue(settings.color() == 0x2EE84A && settings.brightness() == 7 && settings.power() == 3
+                && settings.redstone() == RedstoneMode.DIMMER, "the look is applied");
+        helper.assertTrue(settings.range() == FixtureType.FLOODLIGHT.maxRange(), "a range above a floodlight's maximum is clamped");
+        helper.assertTrue(settings.beam() == FixtureType.FLOODLIGHT.minBeam(), "a too narrow beam is widened");
+        helper.assertTrue(settings.mode() == AimMode.POINT && target.equals(linked.targetPoint()), "the point target is kept");
+        Vec3 expected = target.subtract(linked.pivot()).normalize();
+        helper.assertTrue(linked.desiredDirection(0).distanceTo(expected) < EPSILON, "aims at the same spot from its own place");
+        helper.assertTrue(unlinked.settings().equals(untouched), "an unlinked fixture is unchanged");
+
+        Cow cow = helper.spawn(EntityType.COW, new Vec3(6, 2, 6));
+        source.follow(cow);
+        LightingRemoteItem.applyToLinked(player, source);
+        helper.assertTrue(linked.settings().mode() == AimMode.FOLLOW && linked.followId() == cow.getId(), "follows the same entity");
         cow.discard();
         helper.succeed();
     }

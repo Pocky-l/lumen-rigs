@@ -4,6 +4,13 @@ All notable changes to this mod are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - Unreleased
+### Added
+- "Apply to linked" button in the fixture settings: gives all settings of the open fixture to every other fixture
+  linked to the Lighting Remote you hold (keep it in your off hand). Values a different kind of fixture does not
+  support are brought into its range. Unlike Paste, point and follow aims keep their target, so the whole rig lights
+  the same spot or follows the same mob or player. The button's tooltip shows how many fixtures it will change.
+
 ## [1.1.0] - 2026-10-07
 ### Added
 - Copy and Paste buttons in the fixture settings: copy every setting of one fixture (pan, tilt, beam angle, color,

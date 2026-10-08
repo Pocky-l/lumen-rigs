@@ -59,9 +59,20 @@ public final class LightingRemoteItem extends Item {
         return linked;
     }
 
-    /** Runs {@code action} on every linked fixture that is loaded in the player's dimension and within range. */
-    public static int forEachLinked(ItemStack stack, Player player, Consumer<FixtureBlockEntity> action) {
-        int count = 0;
+    /** The remote in the player's main hand, else in the off hand, else an empty stack. */
+    public static ItemStack heldRemote(Player player) {
+        for (InteractionHand hand : InteractionHand.values()) {
+            ItemStack stack = player.getItemInHand(hand);
+            if (stack.getItem() instanceof LightingRemoteItem) {
+                return stack;
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    /** Every linked fixture that is loaded in the player's dimension and within range. */
+    public static List<FixtureBlockEntity> linkedFixtures(ItemStack stack, Player player) {
+        List<FixtureBlockEntity> fixtures = new ArrayList<>();
         double range = Config.remoteRange();
         for (GlobalPos link : links(stack)) {
             BlockPos pos = link.pos();
@@ -70,11 +81,41 @@ public final class LightingRemoteItem extends Item {
                 continue;
             }
             if (player.level().getBlockEntity(pos) instanceof FixtureBlockEntity fixture) {
-                action.accept(fixture);
-                count++;
+                fixtures.add(fixture);
             }
         }
-        return count;
+        return fixtures;
+    }
+
+    /** Runs {@code action} on every linked fixture that is loaded in the player's dimension and within range. */
+    public static int forEachLinked(ItemStack stack, Player player, Consumer<FixtureBlockEntity> action) {
+        List<FixtureBlockEntity> fixtures = linkedFixtures(stack, player);
+        fixtures.forEach(action);
+        return fixtures.size();
+    }
+
+    /** The fixtures "Apply to linked" on {@code source} would change: the linked ones except the source itself. */
+    public static List<FixtureBlockEntity> applyTargets(ItemStack stack, Player player, FixtureBlockEntity source) {
+        List<FixtureBlockEntity> fixtures = linkedFixtures(stack, player);
+        fixtures.removeIf(fixture -> fixture == source);
+        return fixtures;
+    }
+
+    /**
+     * Server: gives every fixture linked to the held remote the settings of {@code source} and tells the player how
+     * many changed. Fixtures the player may not edit (spawn protection) are skipped.
+     */
+    public static int applyToLinked(Player player, FixtureBlockEntity source) {
+        ItemStack remote = heldRemote(player);
+        int applied = 0;
+        for (FixtureBlockEntity fixture : applyTargets(remote, player, source)) {
+            if (player.mayInteract(player.level(), fixture.getBlockPos())) {
+                fixture.copyFrom(source);
+                applied++;
+            }
+        }
+        report(player, player.level(), applied, "applied");
+        return applied;
     }
 
     @Override
