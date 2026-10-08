@@ -1,13 +1,12 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.pockyl.lumen_rigs.mixin",
+  "package": "com.pockyl.lumen_rigs.mixin.embeddium",
+  "plugin": "com.pockyl.lumen_rigs.mixin.embeddium.EmbeddiumMixinPlugin",
   "refmap": "lumen_rigs.refmap.json",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "EntityRendererMixin",
-    "LevelRendererMixin",
-    "ModelBlockRendererMixin"
+    "EmbeddiumBlockRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 0
