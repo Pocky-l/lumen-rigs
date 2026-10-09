@@ -4,7 +4,7 @@ All notable changes to this mod are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.0] - Unreleased
+## [1.2.0] - 2026-10-09
 ### Added
 - "Apply to linked" button in the fixture settings: gives all settings of the open fixture to every other fixture
   linked to the Lighting Remote you hold (keep it in your off hand). Values a different kind of fixture does not
