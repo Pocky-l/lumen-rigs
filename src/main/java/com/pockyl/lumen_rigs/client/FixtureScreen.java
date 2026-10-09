@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +22,8 @@ import com.pockyl.lumen_rigs.fixture.Aim;
 import com.pockyl.lumen_rigs.fixture.AimMode;
 import com.pockyl.lumen_rigs.fixture.FixtureSettings;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
+import com.pockyl.lumen_rigs.item.LightingRemoteItem;
+import com.pockyl.lumen_rigs.network.ApplyToLinkedPayload;
 import com.pockyl.lumen_rigs.network.ConfigureFixturePayload;
 
 import java.util.Locale;
@@ -102,25 +105,60 @@ public final class FixtureScreen extends Screen {
                 .bounds(left + width - 80, hueY, 80, 20)
                 .build());
 
+        // Copy, Paste, Apply to linked and Done share one row; it shrinks with the screen so small GUIs still fit it.
         int bottomY = hueY + ROW + 6;
+        int unit = (Math.min(this.width - 8, 352) - 3 * 4) / 10;
+        int x = (this.width - (10 * unit + 3 * 4)) / 2;
         addRenderableWidget(Button.builder(Component.translatable("lumen_rigs.screen.copy"), button -> {
                     clipboard = settings;
                     rebuildWidgets();
                 })
-                .bounds(this.width / 2 - 50 - 4 - 70, bottomY, 70, 20)
+                .bounds(x, bottomY, 2 * unit, 20)
                 .tooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.copy.hint")))
                 .build());
-        addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> onClose())
-                .bounds(this.width / 2 - 50, bottomY, 100, 20)
-                .build());
+        x += 2 * unit + 4;
         Button paste = addRenderableWidget(Button.builder(Component.translatable("lumen_rigs.screen.paste"), button -> {
                     update(FixtureSettings.paste(clipboard, fixture.type()));
                     rebuildWidgets();
                 })
-                .bounds(this.width / 2 + 50 + 4, bottomY, 70, 20)
+                .bounds(x, bottomY, 2 * unit, 20)
                 .tooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.paste.hint")))
                 .build());
         paste.active = clipboard != null;
+        x += 2 * unit + 4;
+        initApplyToLinked(x, bottomY, 3 * unit);
+        x += 3 * unit + 4;
+        addRenderableWidget(Button.builder(Component.translatable("gui.done"), button -> onClose())
+                .bounds(x, bottomY, 3 * unit, 20)
+                .build());
+    }
+
+    /** Gives the fixtures linked to the held remote everything set here; inactive without a remote or links. */
+    private void initApplyToLinked(int x, int y, int buttonWidth) {
+        int targets = 0;
+        boolean holdsRemote = false;
+        if (minecraft != null && minecraft.player != null) {
+            ItemStack remote = LightingRemoteItem.heldRemote(minecraft.player);
+            holdsRemote = !remote.isEmpty();
+            targets = holdsRemote ? LightingRemoteItem.applyTargets(remote, minecraft.player, fixture).size() : 0;
+        }
+        Component hint;
+        if (!holdsRemote) {
+            hint = Component.translatable("lumen_rigs.screen.apply_linked.no_remote");
+        } else if (targets == 0) {
+            hint = Component.translatable("lumen_rigs.screen.apply_linked.no_links");
+        } else {
+            hint = Component.translatable("lumen_rigs.screen.apply_linked.hint", targets);
+        }
+        Button apply = addRenderableWidget(Button.builder(Component.translatable("lumen_rigs.screen.apply_linked"), button -> {
+                    // The server reads the settings from this fixture, so it has to have the latest ones first.
+                    send();
+                    PacketDistributor.sendToServer(new ApplyToLinkedPayload(fixture.getBlockPos()));
+                })
+                .bounds(x, y, buttonWidth, 20)
+                .tooltip(Tooltip.create(hint))
+                .build());
+        apply.active = targets > 0;
     }
 
     /** Left column: where the fixture points. */

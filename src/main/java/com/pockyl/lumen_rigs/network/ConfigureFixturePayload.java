@@ -29,12 +29,14 @@ public record ConfigureFixturePayload(BlockPos pos, FixtureSettings settings) im
 
     public static void handle(ConfigureFixturePayload payload, IPayloadContext context) {
         Player player = context.player();
-        if (player.isSpectator() || !player.mayBuild() || player.distanceToSqr(payload.pos.getCenter()) > MAX_DISTANCE_SQR
-                || !player.level().isLoaded(payload.pos)) {
-            return;
-        }
-        if (player.level().getBlockEntity(payload.pos) instanceof FixtureBlockEntity fixture) {
+        if (mayConfigure(player, payload.pos) && player.level().getBlockEntity(payload.pos) instanceof FixtureBlockEntity fixture) {
             fixture.applySettings(payload.settings);
         }
+    }
+
+    /** Whether the player may change the fixture at {@code pos} from its settings screen. */
+    static boolean mayConfigure(Player player, BlockPos pos) {
+        return !player.isSpectator() && player.mayBuild() && player.distanceToSqr(pos.getCenter()) <= MAX_DISTANCE_SQR
+                && player.level().isLoaded(pos);
     }
 }
