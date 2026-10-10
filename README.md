@@ -149,6 +149,15 @@ The jar is written to `build/libs/`.
     </td>
   </tr>
   <tr>
+    <td align="center" width="112"><a href="https://www.curseforge.com/minecraft/mc-mods/inventory-backups"><img src="https://raw.githubusercontent.com/Pocky-l/inventory-backups/main/docs/icon.png" width="96" alt="Inventory Backups"></a></td>
+    <td>
+      <a href="https://www.curseforge.com/minecraft/mc-mods/inventory-backups"><b>Inventory Backups</b></a><br>
+      Automatic player inventory and ender chest backups with a clickable chat browser, previews and one-click restore for admins.<br>
+      <a href="https://www.curseforge.com/minecraft/mc-mods/inventory-backups"><img alt="CurseForge" src="https://img.shields.io/curseforge/dt/836385?logo=curseforge&label=CurseForge&color=F16436"></a>
+      <a href="https://github.com/Pocky-l/inventory-backups"><img alt="GitHub" src="https://img.shields.io/badge/GitHub-source-181717?logo=github"></a>
+    </td>
+  </tr>
+  <tr>
     <td align="center" width="112"><a href="https://www.curseforge.com/minecraft/mc-mods/neon-glowsticks"><img src="https://raw.githubusercontent.com/Pocky-l/neon-glowsticks/main/docs/icon.png" width="96" alt="Neon Glowsticks"></a></td>
     <td>
       <a href="https://www.curseforge.com/minecraft/mc-mods/neon-glowsticks"><b>Neon Glowsticks</b></a><br>
