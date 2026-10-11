@@ -1,102 +1,85 @@
 # Lumen Rigs
 
-Aimable spotlights, floodlights, searchlights and soft panels with colored light and visible beams.
+**Stage lighting for Minecraft** - aimable spotlights, floodlights, searchlights and soft panels with coloured light
+and visible beams.
 
 ![Colored beams in the night sky: colors mix like light](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/screenshots/color-mixing.jpg)
 
-*Colored beams in the night sky: colors mix like light*
+📦 **Requires** [NeoForge](https://neoforged.net) 1.21.1 on client and server · optional
+[Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib) for per-pixel lighting
 
-## Features
+## ✨ Features
 
-- **Four fixtures** on motorized yokes that turn smoothly to their aim:
-  - **Spotlight**: a zoomable stage spot, 5–45°, reaches 32 blocks.
-  - **Floodlight**: a wide LED wash with barn doors, 40–120°.
-  - **Searchlight**: a tight 2–15° beam that reaches 64 blocks, made for sweeping the night sky.
-  - **Soft Light Panel**: a flat panel that softly lights everything in front of it.
-- **Mount anywhere**: floor, walls or ceiling.
-- **Realistic light with [Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib)** (optional, recommended):
-  per-pixel spot and area lights like in a 3D renderer, with soft cone edges, shading by angle, block shadows and
-  beams that scatter in the air.
-- **Works without Veil too**: the mod's own directional light lights the spot the beam points at, with soft edges
-  and shadows behind walls, and lights up mobs and players in it.
-- **Any color**: 16 dye colors, a hue slider or warm white. Colors mix like light: red and green make yellow.
-- **Visible beams** with a lens flare when a fixture points at you.
-- **Lighting Remote**: link fixtures, then aim them all at a block, make them follow a mob or player, or shine where
-  you look. Linked fixtures are outlined while you hold it.
-- **Settings screen** (right-click a fixture): aim mode (manual, point, follow, sweep), pan, tilt, beam angle, sweep,
-  "Aim at me"; brightness, **power** (25–400%), **softness** (crisp spot to diffuse light), **range** (searchlights
-  reach 256 blocks into the sky), **beam visibility**, redstone mode and color. Changes show instantly. **Copy** and
-  **Paste** carry all settings, aim included, over to other fixtures, and **Apply to linked** gives them to every
-  fixture linked to your Lighting Remote at once, all aimed at the same spot or the same target.
-- **Atmosphere**: beams show more in rain, storms and under water.
-- **Redstone**: ignore it, switch with a signal, or use the signal strength as a dimmer.
+- 🔦 **Four fixtures on motorized yokes** - a zoomable **Spotlight** (5-45°), a wide **Floodlight** with barn doors, a
+  **Searchlight** for the night sky (up to 256 blocks) and a **Soft Light Panel**; floor, wall or ceiling.
+- 🌈 **Any colour** - 16 dye colours, a hue slider or warm white; colours mix like light: red and green make yellow.
+- ✨ **Visible beams** that show more in rain and under water, with a lens flare when a fixture points at you.
+- 💡 **Real light** - with Veil: per-pixel spot and area lights with soft edges and block shadows; without it the mod's
+  own light still lights blocks, mobs and players in the beam.
+- 🎛️ **Settings screen** - aim mode (manual, point, follow, sweep), pan, tilt, beam angle, power, softness, range, beam
+  visibility and redstone; copy and paste settings between fixtures.
+- 📡 **Lighting Remote** - link fixtures and aim them all at a block, make them follow a mob or player, or shine where
+  you look.
+- 🔴 **Redstone** - switch with a signal or use its strength as a dimmer.
+- 🛡️ **Client-side light** - nothing is placed in the world: safe for servers and other mods, mobs still spawn.
 
-## Crafting
+## ⛏️ Crafting
 
-- **Spotlight**: iron ingots, a redstone lamp, a glass pane and a copper ingot.
-- **Floodlight**: iron ingots, two redstone lamps, a glass pane and a copper ingot.
-- **Searchlight**: iron ingots, two redstone lamps, glass, iron blocks and a copper ingot.
-- **Soft Light Panel** (2): paper, iron ingots and glowstone.
-- **Lighting Remote**: a redstone torch, redstone and an iron ingot.
+- **Spotlight** - iron ingots, a redstone lamp, a glass pane and a copper ingot
+- **Floodlight** - iron ingots, two redstone lamps, a glass pane and a copper ingot
+- **Searchlight** - iron ingots, two redstone lamps, glass, iron blocks and a copper ingot
+- **Soft Light Panel** (x2) - paper, iron ingots and glowstone
+- **Lighting Remote** - a redstone torch, redstone and an iron ingot
 
-Use JEI or the recipe book for the exact shapes.
+Exact shapes in JEI or the recipe book.
 
-## Compatibility
+## 🤝 Compatibility
 
-The light is client-side: nothing is placed in the world, so it is safe for servers and other mods, and it does not
-stop mobs from spawning. The built-in light works with vanilla rendering and with
-[Sodium](https://modrinth.com/mod/sodium). Veil turns its lights off when [Iris](https://modrinth.com/mod/iris) is
-installed, so with Iris the built-in light and beams are used. Other chunk renderers (such as Embeddium) bypass the
-built-in light: the game keeps working and the fixtures and beams still show, but blocks are not lit.
+[![Veil](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/compat/veil.png)](https://www.curseforge.com/minecraft/mc-mods/veil-lib) ✅ **[Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib)** (optional, recommended) - realistic per-pixel lights, soft cone edges, block shadows and beams scattering in the air.
 
-## Requirements
+[![Sodium](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/compat/sodium.png)](https://modrinth.com/mod/sodium) ✅ **[Sodium](https://modrinth.com/mod/sodium)** - the built-in light works.
 
-[NeoForge](https://neoforged.net) 1.21.1. Needed on both the client and the server.
-Optional: [Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib) for realistic per-pixel lighting.
+[![Iris](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/compat/iris.png)](https://modrinth.com/mod/iris) ✅ **[Iris](https://modrinth.com/mod/iris)** (shader packs) - Veil turns its lights off with Iris, so the built-in light and beams are used.
 
-## Screenshots
+[![Embeddium](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/compat/embeddium.png)](https://www.curseforge.com/minecraft/mc-mods/embeddium) ❌ **[Embeddium](https://www.curseforge.com/minecraft/mc-mods/embeddium)** - its chunk renderer bypasses the built-in light: fixtures and beams show, blocks are not lit.
+
+## 📸 Screenshots
 
 ![Spotlights on glass stands lighting a block at dusk](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/screenshots/spotlights.jpg)
 
 *Spotlights on glass stands lighting a block at dusk*
 
-## Credits
+## 💛 Credits
 
-Made by **Pocky**. Source code: [GitHub](https://github.com/Pocky-l/lumen-rigs)
+Made by **Pocky** · [source code](https://github.com/Pocky-l/lumen-rigs)
 
 <!-- more-mods:start -->
 ## More mods by Pocky
 
-[![Turbo for Distant Horizons](https://raw.githubusercontent.com/Pocky-l/dhturbo/main/docs/icon.png)](https://www.curseforge.com/minecraft/mc-mods/turbo-for-distant-horizons)
+**🌦️ Weather & nature**
 
-**[Turbo for Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/turbo-for-distant-horizons)** - Distant Horizons addon: generates distant terrain from the world noise many times faster, with real trees nearby. ([source](https://github.com/Pocky-l/dhturbo))
+[![Hoarfrost: Snow & Blizzards](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/more-mods/hoarfrost.png)](https://www.curseforge.com/minecraft/mc-mods/hoarfrost-snow-blizzards) **[Hoarfrost: Snow & Blizzards](https://www.curseforge.com/minecraft/mc-mods/hoarfrost-snow-blizzards)** - seven kinds of snowfall, a living wind and soft snow on the land
 
-[![Hoarfrost: Snow & Blizzards](https://raw.githubusercontent.com/Pocky-l/hoarfrost/main/docs/icon.png)](https://www.curseforge.com/minecraft/mc-mods/hoarfrost-snow-blizzards)
+[![Petrichor: Rain & Storms](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/more-mods/petrichor.png)](https://www.curseforge.com/minecraft/mc-mods/petrichor-rain-storms) **[Petrichor: Rain & Storms](https://www.curseforge.com/minecraft/mc-mods/petrichor-rain-storms)** - realistic rain, puddles, drips and branching lightning
 
-**[Hoarfrost: Snow & Blizzards](https://www.curseforge.com/minecraft/mc-mods/hoarfrost-snow-blizzards)** - Cosy, realistic snowy weather: seven kinds of snowfall and blizzard, flakes carried by a living wind, soft snow settling on the land and a quiet winter soundscape. ([source](https://github.com/Pocky-l/hoarfrost))
+[![Rustling Leaves](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/more-mods/rustling_leaves.png)](https://www.curseforge.com/minecraft/mc-mods/rustling-leaves) **[Rustling Leaves](https://www.curseforge.com/minecraft/mc-mods/rustling-leaves)** - falling leaves and leaf piles you can wade through, rake and blow away
 
-[![Holy Staff](https://raw.githubusercontent.com/Pocky-l/holy-staff/main/docs/icon.png)](https://www.curseforge.com/minecraft/mc-mods/holy-staff)
+**💡 Light**
 
-**[Holy Staff](https://www.curseforge.com/minecraft/mc-mods/holy-staff)** - A holy staff with three healing skills, aim previews and flying heal numbers. ([source](https://github.com/Pocky-l/holy-staff))
+[![Neon Glowsticks](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/more-mods/neon_glowsticks.png)](https://www.curseforge.com/minecraft/mc-mods/neon-glowsticks) **[Neon Glowsticks](https://www.curseforge.com/minecraft/mc-mods/neon-glowsticks)** - throwable glowsticks that bounce, roll and light up the dark
 
-[![Inventory Backups](https://raw.githubusercontent.com/Pocky-l/inventory-backups/main/docs/icon.png)](https://www.curseforge.com/minecraft/mc-mods/inventory-backups)
+**🎨 Graphics & performance**
 
-**[Inventory Backups](https://www.curseforge.com/minecraft/mc-mods/inventory-backups)** - Automatic player inventory and ender chest backups with a clickable chat browser, previews and one-click restore for admins. ([source](https://github.com/Pocky-l/inventory-backups))
+[![Turbo for Distant Horizons](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/more-mods/dhturbo.png)](https://www.curseforge.com/minecraft/mc-mods/turbo-for-distant-horizons) **[Turbo for Distant Horizons](https://www.curseforge.com/minecraft/mc-mods/turbo-for-distant-horizons)** - Distant Horizons terrain generated many times faster
 
-[![Neon Glowsticks](https://raw.githubusercontent.com/Pocky-l/neon-glowsticks/main/docs/icon.png)](https://www.curseforge.com/minecraft/mc-mods/neon-glowsticks)
+**⚔️ Gear & gameplay**
 
-**[Neon Glowsticks](https://www.curseforge.com/minecraft/mc-mods/neon-glowsticks)** - Throwable glowsticks that bounce, roll and light up the dark with colored light. ([source](https://github.com/Pocky-l/neon-glowsticks))
+[![Holy Staff](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/more-mods/holy_staff.png)](https://www.curseforge.com/minecraft/mc-mods/holy-staff) **[Holy Staff](https://www.curseforge.com/minecraft/mc-mods/holy-staff)** - a healing staff with three skills and flying heal numbers
 
-[![Petrichor: Rain & Storms](https://raw.githubusercontent.com/Pocky-l/petrichor/main/docs/icon.png)](https://www.curseforge.com/minecraft/mc-mods/petrichor-rain-storms)
+[![Rancher's Vacpack](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/more-mods/vacpack.png)](https://www.curseforge.com/minecraft/mc-mods/ranchers-vacpack) **[Rancher's Vacpack](https://www.curseforge.com/minecraft/mc-mods/ranchers-vacpack)** - a Slime Rancher vacuum gun for items and small mobs
 
-**[Petrichor: Rain & Storms](https://www.curseforge.com/minecraft/mc-mods/petrichor-rain-storms)** - Realistic rain and storms: rain types, puddles, runoff and drips, branching lightning with delayed thunder. ([source](https://github.com/Pocky-l/petrichor))
+**🛠️ Server tools**
 
-[![Rustling Leaves](https://raw.githubusercontent.com/Pocky-l/rustling-leaves/main/docs/icon.png)](https://www.curseforge.com/minecraft/mc-mods/rustling-leaves)
-
-**[Rustling Leaves](https://www.curseforge.com/minecraft/mc-mods/rustling-leaves)** - Physically simulated leaves: falling leaves, leaf piles you can wade through, rake and blow away, gusts, whirlwinds and leaf tools. ([source](https://github.com/Pocky-l/rustling-leaves))
-
-[![Rancher's Vacpack](https://raw.githubusercontent.com/Pocky-l/ranchers-vacpack/main/docs/icon.png)](https://www.curseforge.com/minecraft/mc-mods/ranchers-vacpack)
-
-**[Rancher's Vacpack](https://www.curseforge.com/minecraft/mc-mods/ranchers-vacpack)** - A Slime Rancher inspired vacuum gun: suck up items and small mobs, store them in a tank and shoot them back out. ([source](https://github.com/Pocky-l/ranchers-vacpack))
+[![Inventory Backups](https://raw.githubusercontent.com/Pocky-l/lumen-rigs/main/docs/more-mods/inventorybackups.png)](https://www.curseforge.com/minecraft/mc-mods/inventory-backups) **[Inventory Backups](https://www.curseforge.com/minecraft/mc-mods/inventory-backups)** - inventory and ender chest backups with one-click restore for admins
 
 <!-- more-mods:end -->
