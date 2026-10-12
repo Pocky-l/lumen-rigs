@@ -167,6 +167,15 @@ The jar is written to `build/libs/`.
   </tr>
 </table>
 
+**⚡ Tech & energy**
+
+<table>
+  <tr>
+    <td width="56"><a href="https://www.curseforge.com/minecraft/mc-mods/mekanism-advancedgenerators"><img src="docs/more-mods/mekanismadvancedgenerators.png" width="48" alt="Mekanism Advanced Generators"></a></td>
+    <td><a href="https://www.curseforge.com/minecraft/mc-mods/mekanism-advancedgenerators"><b>Mekanism Advanced Generators</b></a> - nine tiers of solar panels, big solar generators, cubes and cables for Mekanism (<a href="https://github.com/Pocky-l/Mekanism-MoreSolarPanels">source</a>)</td>
+  </tr>
+</table>
+
 **🛠️ Server tools**
 
 <table>
