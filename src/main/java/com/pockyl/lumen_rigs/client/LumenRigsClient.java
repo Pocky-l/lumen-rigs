@@ -1,5 +1,6 @@
 package com.pockyl.lumen_rigs.client;
 
+import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -59,7 +60,19 @@ public final class LumenRigsClient {
             if (tintIndex != 0 || level == null || pos == null || !(level.getBlockEntity(pos) instanceof FixtureBlockEntity fixture)) {
                 return -1;
             }
-            return fixture.effectiveBrightness() > 0 ? 0xFF000000 | fixture.settings().color() : 0xFF000000 | OFF_LENS;
+            int brightness = fixture.effectiveBrightness();
+            if (brightness <= 0) {
+                return 0xFF000000 | OFF_LENS;
+            }
+            // Pulse and strobe dim the diffuser towards its off look; the mesh is rebuilt a few times a second for it.
+            return 0xFF000000 | lerpColor(OFF_LENS, fixture.lightColor(0), fixture.lightLevel(0) / brightness);
         }, ModBlocks.SOFT_PANEL.get());
+    }
+
+    private static int lerpColor(int from, int to, float amount) {
+        int r = Math.round(Mth.lerp(amount, from >> 16 & 0xFF, to >> 16 & 0xFF));
+        int g = Math.round(Mth.lerp(amount, from >> 8 & 0xFF, to >> 8 & 0xFF));
+        int b = Math.round(Mth.lerp(amount, from & 0xFF, to & 0xFF));
+        return r << 16 | g << 8 | b;
     }
 }

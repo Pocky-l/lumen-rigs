@@ -25,6 +25,7 @@ import com.pockyl.lumen_rigs.fixture.Aim;
 import com.pockyl.lumen_rigs.fixture.AimMode;
 import com.pockyl.lumen_rigs.fixture.FixtureSettings;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
+import com.pockyl.lumen_rigs.fixture.LightEffect;
 import com.pockyl.lumen_rigs.fixture.RedstoneMode;
 import com.pockyl.lumen_rigs.item.LightingRemoteItem;
 import com.pockyl.lumen_rigs.registry.ModBlocks;
@@ -121,7 +122,7 @@ public final class ModGameTests {
     public static void settingsFromClientsAreClamped(GameTestHelper helper) {
         FixtureBlockEntity fixture = place(helper, new BlockPos(1, 2, 1), ModBlocks.SPOTLIGHT.get().defaultBlockState());
         fixture.applySettings(new FixtureSettings(Float.NaN, 400, 999, 99, 0x7F123456, AimMode.MANUAL, RedstoneMode.IGNORE, -5, 1000,
-                50, -1, Float.POSITIVE_INFINITY, 9999));
+                50, -1, Float.POSITIVE_INFINITY, 9999, null, 99999));
         FixtureSettings settings = fixture.settings();
         helper.assertTrue(settings.power() == FixtureSettings.MAX_POWER && settings.softness() == 0, "power and softness clamped");
         helper.assertTrue(settings.haze() == 1 && settings.range() == FixtureType.SPOTLIGHT.maxRange(), "haze and range clamped");
@@ -130,6 +131,7 @@ public final class ModGameTests {
         helper.assertTrue(settings.color() == 0x123456, "only RGB is kept");
         helper.assertTrue(settings.sweepWidth() == FixtureSettings.MIN_SWEEP_WIDTH && settings.sweepSpeed() == FixtureSettings.MAX_SWEEP_SPEED,
                 "sweep clamped");
+        helper.assertTrue(settings.effect() == LightEffect.STEADY && settings.effectSpeed() == LightEffect.MAX_SPEED, "effect clamped");
         helper.succeed();
     }
 
@@ -137,7 +139,7 @@ public final class ModGameTests {
     public static void pastedSettingsCopyEverything(GameTestHelper helper) {
         FixtureSettings source = FixtureSettings.defaults(FixtureType.SPOTLIGHT).withColor(0xFF2A1E).withBrightness(9).withPower(2.5F)
                 .withSoftness(0.8F).withHaze(2.0F).withRedstone(RedstoneMode.DIMMER).withBeam(12).withRange(20)
-                .withAim(170, -60, AimMode.SWEEP);
+                .withAim(170, -60, AimMode.SWEEP).withEffect(LightEffect.STROBE, 240);
 
         FixtureSettings pasted = FixtureSettings.paste(source, FixtureType.SPOTLIGHT);
         helper.assertTrue(pasted.equals(source), "a fixture of the same kind gets every setting");
@@ -145,11 +147,44 @@ public final class ModGameTests {
         FixtureSettings onFlood = FixtureSettings.paste(source, FixtureType.FLOODLIGHT);
         helper.assertTrue(onFlood.pan() == 170 && onFlood.tilt() == -60 && onFlood.mode() == AimMode.SWEEP, "the aim is pasted");
         helper.assertTrue(onFlood.color() == 0xFF2A1E && onFlood.power() == 2.5F, "the look is pasted");
+        helper.assertTrue(onFlood.effect() == LightEffect.STROBE && onFlood.effectSpeed() == 240, "the effect is pasted");
         helper.assertTrue(onFlood.beam() == FixtureType.FLOODLIGHT.minBeam(), "a too narrow beam is widened to what a floodlight can do");
 
         FixtureSettings pointing = source.withMode(AimMode.POINT);
         helper.assertTrue(FixtureSettings.paste(pointing, FixtureType.SPOTLIGHT).mode() == AimMode.MANUAL,
                 "a point aim becomes a manual aim in the same direction");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", batch = "lightEffectsPlayOnGameTime")
+    public static void lightEffectsPlayOnGameTime(GameTestHelper helper) {
+        helper.assertTrue(LightEffect.STEADY.intensity(0.37) == 1 && LightEffect.STEADY.color(0x123456, 0.37) == 0x123456,
+                "steady changes nothing");
+        helper.assertTrue(LightEffect.PULSE.intensity(0.5) > 0.99F && LightEffect.PULSE.intensity(1.0) < 0.11F,
+                "pulse: full mid-cycle, dim at the start");
+        helper.assertTrue(LightEffect.STROBE.intensity(2.1) == 1 && LightEffect.STROBE.intensity(2.6) == 0, "strobe: a flash, then dark");
+        int red = 0xFF0000;
+        helper.assertTrue(LightEffect.RAINBOW.color(red, 0) == red, "the rainbow starts from the set color");
+        int third = LightEffect.RAINBOW.color(red, 1.0 / 3);
+        helper.assertTrue((third >> 8 & 0xFF) > 0xF0 && (third >> 16 & 0xFF) < 0x40,
+                "a third of a cycle later it is green, got " + Integer.toHexString(third));
+        int fromWhite = LightEffect.RAINBOW.color(FixtureSettings.WARM_WHITE, 0.5);
+        int min = Math.min(fromWhite >> 16 & 0xFF, Math.min(fromWhite >> 8 & 0xFF, fromWhite & 0xFF));
+        helper.assertTrue(min < 0x40, "a rainbow from warm white is saturated, got " + Integer.toHexString(fromWhite));
+        // 60 per minute = one cycle per second = 20 ticks.
+        helper.assertTrue(Math.abs(LightEffect.cycles(30, 0.5F, 60) - 1.525) < EPSILON, "cycles follow game time and speed");
+
+        FixtureBlockEntity fixture = place(helper, new BlockPos(1, 2, 1), ModBlocks.SPOTLIGHT.get().defaultBlockState());
+        fixture.applySettings(fixture.settings().withEffect(LightEffect.STROBE, 60));
+        CompoundTag saved = fixture.settings().save();
+        FixtureSettings loaded = FixtureSettings.load(saved, FixtureType.SPOTLIGHT);
+        helper.assertTrue(loaded.effect() == LightEffect.STROBE && loaded.effectSpeed() == 60, "the effect is saved");
+        CompoundTag old = saved.copy();
+        old.remove("Effect");
+        old.remove("EffectSpeed");
+        helper.assertTrue(FixtureSettings.load(old, FixtureType.SPOTLIGHT).effect() == LightEffect.STEADY,
+                "fixtures from older versions stay steady");
+        helper.assertTrue(fixture.lightLevel(0) == 0 || fixture.lightLevel(0) == 15, "a strobing fixture is either dark or fully on");
         helper.succeed();
     }
 

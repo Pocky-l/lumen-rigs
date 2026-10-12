@@ -47,7 +47,7 @@
   "lumen_rigs.screen.copy": "Copy",
   "lumen_rigs.screen.copy.hint": "Remembers all settings of this fixture to paste them onto other fixtures.",
   "lumen_rigs.screen.paste": "Paste",
-  "lumen_rigs.screen.paste.hint": "Applies all copied settings: pan, tilt, beam angle, color, brightness, power, softness, range, beam visibility, redstone and sweep. Values this kind of fixture does not support are brought into its range.",
+  "lumen_rigs.screen.paste.hint": "Applies all copied settings: pan, tilt, beam angle, color, brightness, power, softness, range, beam visibility, redstone, sweep and light effect. Values this kind of fixture does not support are brought into its range.",
   "lumen_rigs.screen.apply_linked": "Apply to linked",
   "lumen_rigs.screen.apply_linked.hint": "Gives all settings of this fixture to the %s other fixtures linked to your Lighting Remote. Values a fixture does not support are brought into its range. Point and follow aims keep their target, so all of them light the same spot or follow the same target.",
   "lumen_rigs.screen.apply_linked.no_remote": "Hold a Lighting Remote (e.g. in your off hand) to give these settings to all fixtures linked to it.",
@@ -84,5 +84,16 @@
   "lumen_rigs.screen.range": "Range: %s",
   "lumen_rigs.screen.range.hint": "How far the light reaches. A searchlight reaches 256 blocks into the sky.",
   "lumen_rigs.screen.haze": "Beam visibility: %s",
-  "lumen_rigs.screen.haze.hint": "How much the beam shows in the air. Rain, storms and water make beams denser."
+  "lumen_rigs.screen.haze.hint": "How much the beam shows in the air. Rain, storms and water make beams denser.",
+  "lumen_rigs.screen.effect": "Effect: %s",
+  "lumen_rigs.screen.effect.steady": "Steady",
+  "lumen_rigs.screen.effect.steady.hint": "Plain light, no effect.",
+  "lumen_rigs.screen.effect.pulse": "Pulse",
+  "lumen_rigs.screen.effect.pulse.hint": "The light breathes smoothly between dim and full brightness.",
+  "lumen_rigs.screen.effect.strobe": "Strobe",
+  "lumen_rigs.screen.effect.strobe.hint": "Short bright flashes. Fast strobes show best on beams and with Veil; the built-in light updates a few times a second.",
+  "lumen_rigs.screen.effect.rainbow": "Rainbow",
+  "lumen_rigs.screen.effect.rainbow.hint": "The color travels around the color wheel, starting from the color set below.",
+  "lumen_rigs.screen.effect_speed": "Per minute: %s",
+  "lumen_rigs.screen.effect_speed.hint": "How many pulses, flashes or color cycles per minute. Fixtures with the same effect and speed play in step."
 }

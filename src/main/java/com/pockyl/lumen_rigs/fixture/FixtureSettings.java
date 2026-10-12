@@ -20,9 +20,12 @@ import net.minecraft.util.Mth;
  * @param softness   edge of the light: 0 hard (profile spot), 1 fully diffuse
  * @param haze       how visible the beam is in the air, 1 = normal
  * @param range      how far the light reaches, in blocks
+ * @param effect      effect played by the light
+ * @param effectSpeed effect cycles per minute
  */
 public record FixtureSettings(float pan, float tilt, float beam, int brightness, int color, AimMode mode, RedstoneMode redstone,
-        float sweepWidth, float sweepSpeed, float power, float softness, float haze, float range) {
+        float sweepWidth, float sweepSpeed, float power, float softness, float haze, float range, LightEffect effect,
+        float effectSpeed) {
     public static final int WARM_WHITE = 0xFFF1DC;
     public static final float MIN_SWEEP_WIDTH = 5;
     public static final float MAX_SWEEP_WIDTH = 90;
@@ -47,15 +50,18 @@ public record FixtureSettings(float pan, float tilt, float beam, int brightness,
                 buf.writeFloat(settings.softness);
                 buf.writeFloat(settings.haze);
                 buf.writeFloat(settings.range);
+                ByteBufCodecs.VAR_INT.encode(buf, settings.effect.ordinal());
+                buf.writeFloat(settings.effectSpeed);
             },
             buf -> new FixtureSettings(buf.readFloat(), buf.readFloat(), buf.readFloat(), ByteBufCodecs.VAR_INT.decode(buf),
                     buf.readInt(), AimMode.byId(ByteBufCodecs.VAR_INT.decode(buf)), RedstoneMode.byId(ByteBufCodecs.VAR_INT.decode(buf)),
-                    buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat()));
+                    buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat(),
+                    LightEffect.byId(ByteBufCodecs.VAR_INT.decode(buf)), buf.readFloat()));
 
     public static FixtureSettings defaults(FixtureType type) {
         float tilt = type == FixtureType.SEARCHLIGHT ? 45 : -30;
         return new FixtureSettings(0, tilt, type.defaultBeam(), 15, WARM_WHITE, AimMode.MANUAL, RedstoneMode.IGNORE, 40, 6,
-                1.0F, type.defaultSoftness(), 1.0F, type.range());
+                1.0F, type.defaultSoftness(), 1.0F, type.range(), LightEffect.STEADY, LightEffect.DEFAULT_SPEED);
     }
 
     /** Brings every value into the range the fixture supports; applied to everything a client sends. */
@@ -74,7 +80,9 @@ public record FixtureSettings(float pan, float tilt, float beam, int brightness,
                 clamp(power, MIN_POWER, MAX_POWER, 1),
                 clamp(softness, 0, 1, type.defaultSoftness()),
                 clamp(haze, 0, MAX_HAZE, 1),
-                clamp(range, type.minRange(), type.maxRange(), type.range()));
+                clamp(range, type.minRange(), type.maxRange(), type.range()),
+                effect == null ? LightEffect.STEADY : effect,
+                clamp(effectSpeed, LightEffect.MIN_SPEED, LightEffect.MAX_SPEED, LightEffect.DEFAULT_SPEED));
     }
 
     private static float clamp(float value, float min, float max, float fallback) {
@@ -82,8 +90,8 @@ public record FixtureSettings(float pan, float tilt, float beam, int brightness,
     }
 
     public FixtureSettings withAim(float newPan, float newTilt, AimMode newMode) {
-        return new FixtureSettings(newPan, newTilt, beam, brightness, color, newMode, redstone, sweepWidth, sweepSpeed, power, softness, haze,
-                range);
+        return new FixtureSettings(newPan, newTilt, beam, brightness, color, newMode, redstone, sweepWidth, sweepSpeed, power, softness,
+                haze, range, effect, effectSpeed);
     }
 
     public FixtureSettings withMode(AimMode newMode) {
@@ -91,39 +99,53 @@ public record FixtureSettings(float pan, float tilt, float beam, int brightness,
     }
 
     public FixtureSettings withRedstone(RedstoneMode newRedstone) {
-        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, newRedstone, sweepWidth, sweepSpeed, power, softness, haze, range);
+        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, newRedstone, sweepWidth, sweepSpeed, power, softness, haze,
+                range, effect, effectSpeed);
     }
 
     public FixtureSettings withBeam(float newBeam) {
-        return new FixtureSettings(pan, tilt, newBeam, brightness, color, mode, redstone, sweepWidth, sweepSpeed, power, softness, haze, range);
+        return new FixtureSettings(pan, tilt, newBeam, brightness, color, mode, redstone, sweepWidth, sweepSpeed, power, softness, haze,
+                range, effect, effectSpeed);
     }
 
     public FixtureSettings withBrightness(int newBrightness) {
-        return new FixtureSettings(pan, tilt, beam, newBrightness, color, mode, redstone, sweepWidth, sweepSpeed, power, softness, haze, range);
+        return new FixtureSettings(pan, tilt, beam, newBrightness, color, mode, redstone, sweepWidth, sweepSpeed, power, softness, haze,
+                range, effect, effectSpeed);
     }
 
     public FixtureSettings withColor(int newColor) {
-        return new FixtureSettings(pan, tilt, beam, brightness, newColor, mode, redstone, sweepWidth, sweepSpeed, power, softness, haze, range);
+        return new FixtureSettings(pan, tilt, beam, brightness, newColor, mode, redstone, sweepWidth, sweepSpeed, power, softness, haze,
+                range, effect, effectSpeed);
     }
 
     public FixtureSettings withSweep(float newWidth, float newSpeed) {
-        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, redstone, newWidth, newSpeed, power, softness, haze, range);
+        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, redstone, newWidth, newSpeed, power, softness, haze,
+                range, effect, effectSpeed);
     }
 
     public FixtureSettings withPower(float newPower) {
-        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, redstone, sweepWidth, sweepSpeed, newPower, softness, haze, range);
+        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, redstone, sweepWidth, sweepSpeed, newPower, softness, haze,
+                range, effect, effectSpeed);
     }
 
     public FixtureSettings withSoftness(float newSoftness) {
-        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, redstone, sweepWidth, sweepSpeed, power, newSoftness, haze, range);
+        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, redstone, sweepWidth, sweepSpeed, power, newSoftness, haze,
+                range, effect, effectSpeed);
     }
 
     public FixtureSettings withHaze(float newHaze) {
-        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, redstone, sweepWidth, sweepSpeed, power, softness, newHaze, range);
+        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, redstone, sweepWidth, sweepSpeed, power, softness, newHaze,
+                range, effect, effectSpeed);
     }
 
     public FixtureSettings withRange(float newRange) {
-        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, redstone, sweepWidth, sweepSpeed, power, softness, haze, newRange);
+        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, redstone, sweepWidth, sweepSpeed, power, softness, haze,
+                newRange, effect, effectSpeed);
+    }
+
+    public FixtureSettings withEffect(LightEffect newEffect, float newSpeed) {
+        return new FixtureSettings(pan, tilt, beam, brightness, color, mode, redstone, sweepWidth, sweepSpeed, power, softness, haze,
+                range, newEffect, newSpeed);
     }
 
     /**
@@ -151,6 +173,8 @@ public record FixtureSettings(float pan, float tilt, float beam, int brightness,
         tag.putFloat("Softness", softness);
         tag.putFloat("Haze", haze);
         tag.putFloat("Range", range);
+        tag.putString("Effect", effect.name());
+        tag.putFloat("EffectSpeed", effectSpeed);
         return tag;
     }
 
@@ -164,7 +188,9 @@ public record FixtureSettings(float pan, float tilt, float beam, int brightness,
                 parse(RedstoneMode.class, tag.getString("Redstone"), RedstoneMode.IGNORE),
                 orDefault(tag, "SweepWidth", defaults.sweepWidth), orDefault(tag, "SweepSpeed", defaults.sweepSpeed),
                 orDefault(tag, "Power", defaults.power), orDefault(tag, "Softness", defaults.softness),
-                orDefault(tag, "Haze", defaults.haze), orDefault(tag, "Range", defaults.range)).clamp(type);
+                orDefault(tag, "Haze", defaults.haze), orDefault(tag, "Range", defaults.range),
+                parse(LightEffect.class, tag.getString("Effect"), LightEffect.STEADY),
+                orDefault(tag, "EffectSpeed", defaults.effectSpeed)).clamp(type);
     }
 
     private static float orDefault(CompoundTag tag, String key, float fallback) {

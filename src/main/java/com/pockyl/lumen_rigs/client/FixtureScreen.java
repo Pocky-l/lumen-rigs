@@ -22,6 +22,7 @@ import com.pockyl.lumen_rigs.fixture.Aim;
 import com.pockyl.lumen_rigs.fixture.AimMode;
 import com.pockyl.lumen_rigs.fixture.FixtureSettings;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
+import com.pockyl.lumen_rigs.fixture.LightEffect;
 import com.pockyl.lumen_rigs.item.LightingRemoteItem;
 import com.pockyl.lumen_rigs.network.ApplyToLinkedPayload;
 import com.pockyl.lumen_rigs.network.ConfigureFixturePayload;
@@ -227,7 +228,20 @@ public final class FixtureScreen extends Screen {
             slider(lightX, y, COLUMN, "haze", 0, FixtureSettings.MAX_HAZE * 100, 5, settings.haze() * 100, FixtureScreen::percent,
                     value -> update(settings.withHaze((float) value / 100)))
                     .setTooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.haze.hint")));
+            y += ROW;
         }
+        addRenderableWidget(Button.builder(effectLabel(), button -> {
+                    update(settings.withEffect(settings.effect().next(), settings.effectSpeed()));
+                    rebuildWidgets();
+                })
+                .bounds(lightX, y, 92, 20)
+                .tooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.effect." + key(settings.effect()) + ".hint")))
+                .build());
+        ValueSlider speed = slider(lightX + 96, y, COLUMN - 96, "effect_speed", LightEffect.MIN_SPEED, LightEffect.MAX_SPEED, 1,
+                settings.effectSpeed(), value -> String.valueOf((int) value),
+                value -> update(settings.withEffect(settings.effect(), (float) value)));
+        speed.setTooltip(Tooltip.create(Component.translatable("lumen_rigs.screen.effect_speed.hint")));
+        speed.active = settings.effect() != LightEffect.STEADY;
     }
 
     private ValueSlider slider(int x, int y, int width, String name, double min, double max, double step, double value,
@@ -305,6 +319,11 @@ public final class FixtureScreen extends Screen {
 
     private Component modeLabel() {
         return Component.translatable("lumen_rigs.screen.mode", Component.translatable("lumen_rigs.screen.mode." + key(settings.mode())));
+    }
+
+    private Component effectLabel() {
+        return Component.translatable("lumen_rigs.screen.effect",
+                Component.translatable("lumen_rigs.screen.effect." + key(settings.effect())));
     }
 
     private Component redstoneLabel() {

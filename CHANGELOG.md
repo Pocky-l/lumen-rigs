@@ -4,6 +4,16 @@ All notable changes to this mod are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - Unreleased
+### Added
+- Light effects in the fixture settings: **Pulse** (the light breathes between dim and full), **Strobe** (short
+  bright flashes) and **Rainbow** (the color travels around the color wheel, starting from the set color), with a
+  speed slider from 6 to 600 per minute.
+- Effects run on the world's clock, so every fixture with the same effect and speed plays in step, and every player
+  sees the same show. Copy, Paste and Apply to linked carry the effect too.
+- With [Veil](https://www.curseforge.com/minecraft/mc-mods/veil-lib) and on the beams the effects play smoothly; the
+  built-in light follows them a few times a second, so it stays light on performance.
+
 ## [1.2.0] - 2026-10-09
 ### Added
 - "Apply to linked" button in the fixture settings: gives all settings of the open fixture to every other fixture

@@ -23,10 +23,13 @@ import com.pockyl.lumen_rigs.LumenRigs;
 import com.pockyl.lumen_rigs.block.FixtureBlockEntity;
 import com.pockyl.lumen_rigs.fixture.FixtureSettings;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
+import com.pockyl.lumen_rigs.fixture.LightEffect;
 
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Client-side colored light of the fixtures.
@@ -42,6 +45,11 @@ import java.util.Map;
 public final class FixtureLights {
     /** Re-cast a still fixture this often, to notice placed or broken blocks. */
     private static final int REFRESH_INTERVAL = 40;
+    /**
+     * A light effect alone rebuilds the light at most this often: every rebuild re-meshes the lit chunk sections, and
+     * a rainbow changes the color every tick. Veil and the beams still play the effect smoothly.
+     */
+    private static final int EFFECT_INTERVAL = 4;
     /** Builds per tick; a turning head is rebuilt at most every other tick. */
     private static final int MAX_BUILDS_PER_TICK = 4;
     private static final double TURN_THRESHOLD = Math.toRadians(0.75);
@@ -53,6 +61,7 @@ public final class FixtureLights {
 
     private static volatile LightSource[] sources = new LightSource[0];
     private static final Map<FixtureBlockEntity, Built> BUILT = new IdentityHashMap<>();
+    private static final Set<FixtureBlockEntity> PANELS_PLAYING = Collections.newSetFromMap(new IdentityHashMap<>());
     private static ClientLevel lastLevel;
     private static boolean failed;
 
@@ -69,7 +78,7 @@ public final class FixtureLights {
     }
 
     /** What a source was built from, to know when it has to be rebuilt. */
-    private record Built(LightSource source, Vec3 direction, int brightness, FixtureSettings settings, long builtAt) {
+    private record Built(LightSource source, Vec3 direction, int base, int brightness, int color, FixtureSettings settings, long builtAt) {
 
         /** Whether the settings that shape the light (not the aim, which is compared by direction) changed. */
         boolean shapeChanged(FixtureSettings current) {
@@ -205,6 +214,7 @@ public final class FixtureLights {
         ClientLevel level = minecraft.level;
         if (level != lastLevel) {
             BUILT.clear();
+            PANELS_PLAYING.clear();
             sources = new LightSource[0];
             lastLevel = level;
         }
@@ -223,30 +233,72 @@ public final class FixtureLights {
             Built old = previous.remove(fixture);
             Vec3 direction = fixture.headDirection(1.0F);
             FixtureSettings settings = fixture.settings();
-            int brightness = fixture.effectiveBrightness();
-            boolean changed = old == null || old.brightness() != brightness || old.shapeChanged(settings)
+            int base = fixture.effectiveBrightness();
+            int brightness = Math.round(fixture.lightLevel(0));
+            int color = fixture.lightColor(0);
+            boolean changed = old == null || old.base() != base || old.shapeChanged(settings)
                     || Math.acos(Mth.clamp(old.direction().dot(direction), -1, 1)) > TURN_THRESHOLD;
-            boolean due = old == null || changed && time - old.builtAt() >= 2 || time - old.builtAt() >= REFRESH_INTERVAL;
+            boolean effectChanged = old != null && (old.brightness() != brightness || old.color() != color);
+            long age = old == null ? 0 : time - old.builtAt();
+            boolean due = old == null || changed && age >= 2 || effectChanged && age >= EFFECT_INTERVAL || age >= REFRESH_INTERVAL;
             if (due && (old == null || builds < MAX_BUILDS_PER_TICK)) {
                 builds++;
-                LightSource source = build(level, fixture, direction, brightness);
-                markChanged(old != null ? old.source() : null, source);
-                BUILT.put(fixture, new Built(source, direction, brightness, settings, time));
+                LightSource source = build(level, fixture, direction, brightness, color);
+                // The tint is baked into the meshes too: a new color needs every lit section re-meshed, not only those
+                // whose light level changed.
+                markChanged(old != null ? old.source() : null, source, old != null && old.color() != color);
+                BUILT.put(fixture, new Built(source, direction, base, brightness, color, settings, time));
             } else {
                 BUILT.put(fixture, old);
             }
         }
         for (Built gone : previous.values()) {
-            markChanged(gone.source(), null);
+            markChanged(gone.source(), null, false);
         }
         sources = BUILT.values().stream().map(Built::source).toArray(LightSource[]::new);
+        refreshPanelEffects(minecraft, level, time);
+    }
+
+    /**
+     * A soft panel's diffuser shows the effect in the chunk mesh. The built-in light re-meshes it with its light; with
+     * Veil or the light turned off nothing would, so the panel's section is re-meshed here, once more after the effect
+     * stopped.
+     */
+    private static void refreshPanelEffects(Minecraft minecraft, ClientLevel level, long time) {
+        if (time % EFFECT_INTERVAL != 0) {
+            return;
+        }
+        Set<FixtureBlockEntity> playing = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (FixtureBlockEntity fixture : FixtureBlockEntity.CLIENT_FIXTURES) {
+            if (fixture.type() == FixtureType.SOFT_PANEL && fixture.getLevel() == level && !fixture.isRemoved()
+                    && fixture.settings().effect() != LightEffect.STEADY) {
+                playing.add(fixture);
+            }
+        }
+        for (FixtureBlockEntity fixture : playing) {
+            if (!BUILT.containsKey(fixture)) {
+                setDirty(minecraft, fixture.getBlockPos());
+            }
+        }
+        for (FixtureBlockEntity fixture : PANELS_PLAYING) {
+            if (!playing.contains(fixture) && !fixture.isRemoved()) {
+                setDirty(minecraft, fixture.getBlockPos());
+            }
+        }
+        PANELS_PLAYING.clear();
+        PANELS_PLAYING.addAll(playing);
+    }
+
+    private static void setDirty(Minecraft minecraft, BlockPos pos) {
+        minecraft.levelRenderer.setSectionDirty(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getY()),
+                SectionPos.blockToSectionCoord(pos.getZ()));
     }
 
     // ------------------------------------------------------------------------------------------------
     // Building
     // ------------------------------------------------------------------------------------------------
 
-    static LightSource build(ClientLevel level, FixtureBlockEntity fixture, Vec3 direction, int brightness) {
+    static LightSource build(ClientLevel level, FixtureBlockEntity fixture, Vec3 direction, int brightness, int color) {
         Long2ByteOpenHashMap light = new Long2ByteOpenHashMap();
         if (fixture.type() == FixtureType.SOFT_PANEL) {
             fillPanel(level, fixture, brightness, light);
@@ -254,7 +306,6 @@ public final class FixtureLights {
             castBeam(level, fixture, direction, brightness, light);
             soften(level, light);
         }
-        int color = fixture.settings().color();
         int minX = Integer.MAX_VALUE;
         int minY = Integer.MAX_VALUE;
         int minZ = Integer.MAX_VALUE;
@@ -416,11 +467,11 @@ public final class FixtureLights {
     // Re-meshing
     // ------------------------------------------------------------------------------------------------
 
-    /** Re-meshes the chunk sections where the light differs between the old and the new source. */
-    private static void markChanged(LightSource old, LightSource current) {
+    /** Re-meshes the chunk sections where the light differs between the old and the new source (all lit ones when recolored). */
+    private static void markChanged(LightSource old, LightSource current, boolean recolored) {
         LongSet sections = new LongOpenHashSet();
-        collectChanged(old, current, sections);
-        collectChanged(current, old, sections);
+        collectChanged(old, recolored ? null : current, sections);
+        collectChanged(current, recolored ? null : old, sections);
         Minecraft minecraft = Minecraft.getInstance();
         for (long section : sections) {
             minecraft.levelRenderer.setSectionDirty(SectionPos.x(section), SectionPos.y(section), SectionPos.z(section));

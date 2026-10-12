@@ -23,6 +23,7 @@ import com.pockyl.lumen_rigs.fixture.Aim;
 import com.pockyl.lumen_rigs.fixture.AimMode;
 import com.pockyl.lumen_rigs.fixture.FixtureSettings;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
+import com.pockyl.lumen_rigs.fixture.LightEffect;
 import com.pockyl.lumen_rigs.registry.ModBlockEntities;
 
 import java.util.Collections;
@@ -85,6 +86,20 @@ public final class FixtureBlockEntity extends BlockEntity {
     /** Brightness after redstone, 0-15. */
     public int effectiveBrightness() {
         return settings.redstone().apply(settings.brightness(), signal);
+    }
+
+    /** Brightness after redstone and the light effect at this moment, 0-15. */
+    public float lightLevel(float partialTick) {
+        return effectiveBrightness() * settings.effect().intensity(effectCycles(partialTick));
+    }
+
+    /** Color of the light at this moment (the rainbow effect changes it). */
+    public int lightColor(float partialTick) {
+        return settings.effect().color(settings.color(), effectCycles(partialTick));
+    }
+
+    private double effectCycles(float partialTick) {
+        return level == null ? 0 : LightEffect.cycles(level.getGameTime(), partialTick, settings.effectSpeed());
     }
 
     // ------------------------------------------------------------------------------------------------

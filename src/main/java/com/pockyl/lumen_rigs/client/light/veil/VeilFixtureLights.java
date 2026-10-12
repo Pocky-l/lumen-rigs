@@ -92,7 +92,7 @@ public final class VeilFixtureLights {
             if (handle.getLightData() instanceof SpotLightData spot) {
                 updateSpot(spot, fixture, partialTick);
             } else if (handle.getLightData() instanceof AreaLightData area) {
-                updatePanel(area, fixture);
+                updatePanel(area, fixture, partialTick);
             }
         }
     }
@@ -112,12 +112,12 @@ public final class VeilFixtureLights {
         spot.setOcclusionEnabled(true);
         float air = Atmosphere.scattering(fixture.getLevel(), lens);
         spot.setInscatteringStrength(Config.beams() ? scattering(type) * settings.haze() * air * Config.beamStrength() : 0);
-        spot.setColor(settings.color());
-        spot.setBrightness(fixture.effectiveBrightness() / 15.0F * settings.power() * intensity(type));
+        spot.setColor(fixture.lightColor(partialTick));
+        spot.setBrightness(fixture.lightLevel(partialTick) / 15.0F * settings.power() * intensity(type));
         spot.markDirty();
     }
 
-    private static void updatePanel(AreaLightData area, FixtureBlockEntity fixture) {
+    private static void updatePanel(AreaLightData area, FixtureBlockEntity fixture, float partialTick) {
         Vec3 normal = fixture.mountNormal();
         Vec3 face = fixture.pivot().add(normal.scale(0.12));
         area.getPositionMutable().set(face.x, face.y, face.z);
@@ -127,8 +127,8 @@ public final class VeilFixtureLights {
         area.setDistance(fixture.settings().range());
         area.setOcclusionEnabled(true);
         area.setInscatteringStrength(0);
-        area.setColor(fixture.settings().color());
-        area.setBrightness(fixture.effectiveBrightness() / 15.0F * fixture.settings().power() * intensity(FixtureType.SOFT_PANEL));
+        area.setColor(fixture.lightColor(partialTick));
+        area.setBrightness(fixture.lightLevel(partialTick) / 15.0F * fixture.settings().power() * intensity(FixtureType.SOFT_PANEL));
         area.markDirty();
     }
 

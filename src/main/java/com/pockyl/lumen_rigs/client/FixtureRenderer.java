@@ -83,8 +83,8 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
         Vector3f local = new Quaternionf(mount).conjugate().transform(new Vector3f((float) direction.x, (float) direction.y, (float) direction.z));
         float yokeAngle = (float) Math.atan2(local.x, local.z);
         float tilt = (float) Math.asin(Mth.clamp(local.y, -1, 1));
-        int brightness = fixture.effectiveBrightness();
-        int color = fixture.settings().color();
+        float brightness = fixture.lightLevel(partialTick);
+        int color = fixture.lightColor(partialTick);
         float on = brightness / 15.0F;
         float lensR = Mth.lerp(on, OFF_LENS, (color >> 16 & 0xFF) / 255.0F);
         float lensG = Mth.lerp(on, OFF_LENS, (color >> 8 & 0xFF) / 255.0F);
@@ -107,8 +107,8 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
         renderer.renderModel(pose.last(), solid, null, parts[2], lensR, lensG, lensB, light, overlay, ModelData.EMPTY, null);
         pose.popPose();
 
-        if (brightness > 0) {
-            renderLight(fixture, direction, brightness, pose, buffers);
+        if (brightness > 0.01F) {
+            renderLight(fixture, direction, brightness, color, pose, buffers);
         }
     }
 
@@ -120,13 +120,13 @@ public final class FixtureRenderer implements BlockEntityRenderer<FixtureBlockEn
     // Beam and flare
     // ------------------------------------------------------------------------------------------------
 
-    private static void renderLight(FixtureBlockEntity fixture, Vec3 direction, int brightness, PoseStack pose, MultiBufferSource buffers) {
+    private static void renderLight(FixtureBlockEntity fixture, Vec3 direction, float brightness, int color, PoseStack pose,
+            MultiBufferSource buffers) {
         Level level = fixture.getLevel();
         FixtureType type = fixture.type();
         BlockPos origin = fixture.getBlockPos();
         Vec3 lens = fixture.lens(direction);
         Vec3 camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        int color = fixture.settings().color();
         float r = (color >> 16 & 0xFF) / 255.0F;
         float g = (color >> 8 & 0xFF) / 255.0F;
         float b = (color & 0xFF) / 255.0F;

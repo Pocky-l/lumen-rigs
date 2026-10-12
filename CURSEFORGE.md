@@ -16,8 +16,9 @@ and visible beams.
 - ✨ **Visible beams** that show more in rain and under water, with a lens flare when a fixture points at you.
 - 💡 **Real light** - with Veil: per-pixel spot and area lights with soft edges and block shadows; without it the mod's
   own light still lights blocks, mobs and players in the beam.
+- 🎆 **Light effects** - pulse, strobe or rainbow at any speed; fixtures with the same effect play in step.
 - 🎛️ **Settings screen** - aim mode (manual, point, follow, sweep), pan, tilt, beam angle, power, softness, range, beam
-  visibility and redstone; copy and paste settings between fixtures.
+  visibility, redstone and effect; copy and paste settings between fixtures.
 - 📡 **Lighting Remote** - link fixtures and aim them all at a block, make them follow a mob or player, or shine where
   you look.
 - 🔴 **Redstone** - switch with a signal or use its strength as a dimmer.
