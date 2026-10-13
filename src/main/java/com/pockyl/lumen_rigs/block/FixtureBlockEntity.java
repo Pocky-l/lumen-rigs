@@ -3,6 +3,7 @@ package com.pockyl.lumen_rigs.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -25,6 +26,7 @@ import com.pockyl.lumen_rigs.fixture.FixtureSettings;
 import com.pockyl.lumen_rigs.fixture.FixtureType;
 import com.pockyl.lumen_rigs.fixture.LightEffect;
 import com.pockyl.lumen_rigs.registry.ModBlockEntities;
+import com.pockyl.lumen_rigs.registry.ModDataComponents;
 
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -319,6 +321,34 @@ public final class FixtureBlockEntity extends BlockEntity {
             // The panel's color is baked into the chunk mesh.
             level.setBlocksDirty(worldPosition, getBlockState(), getBlockState());
         }
+    }
+
+    /**
+     * A broken fixture keeps its settings in the dropped item (loot table {@code copy_components}). The aim target stays
+     * behind, so point and follow aims come back as a manual aim, like a paste. Untouched fixtures drop a plain item.
+     */
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        FixtureSettings kept = FixtureSettings.paste(settings, type());
+        if (!kept.equals(FixtureSettings.defaults(type()))) {
+            components.set(ModDataComponents.SETTINGS.get(), kept.save());
+        }
+    }
+
+    @Override
+    protected void applyImplicitComponents(DataComponentInput components) {
+        super.applyImplicitComponents(components);
+        CompoundTag kept = components.get(ModDataComponents.SETTINGS.get());
+        if (kept != null) {
+            settings = FixtureSettings.load(kept, type());
+        }
+    }
+
+    @Override
+    public void removeComponentsFromTag(CompoundTag tag) {
+        super.removeComponentsFromTag(tag);
+        tag.remove("Settings");
     }
 
     @Override

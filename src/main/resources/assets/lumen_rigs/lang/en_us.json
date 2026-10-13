@@ -95,5 +95,8 @@
   "lumen_rigs.screen.effect.rainbow": "Rainbow",
   "lumen_rigs.screen.effect.rainbow.hint": "The color travels around the color wheel, starting from the color set below.",
   "lumen_rigs.screen.effect_speed": "Per minute: %s",
-  "lumen_rigs.screen.effect_speed.hint": "How many pulses, flashes or color cycles per minute. Fixtures with the same effect and speed play in step."
+  "lumen_rigs.screen.effect_speed.hint": "How many pulses, flashes or color cycles per minute. Fixtures with the same effect and speed play in step.",
+  "item.lumen_rigs.fixture.saved": "Keeps its settings",
+  "item.lumen_rigs.fixture.light": "Beam %s°, brightness %s",
+  "item.lumen_rigs.fixture.effect": "Effect: %s"
 }

@@ -3,6 +3,7 @@ package com.pockyl.lumen_rigs.registry;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -20,6 +21,10 @@ public final class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<GlobalPos>>> LINKS = COMPONENTS.registerComponentType(
             "links", builder -> builder.persistent(GlobalPos.CODEC.listOf())
                     .networkSynchronized(GlobalPos.STREAM_CODEC.apply(ByteBufCodecs.list())));
+
+    /** Settings a broken fixture keeps (as {@link com.pockyl.lumen_rigs.fixture.FixtureSettings#save()}). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<CompoundTag>> SETTINGS = COMPONENTS.registerComponentType(
+            "settings", builder -> builder.persistent(CompoundTag.CODEC).networkSynchronized(ByteBufCodecs.COMPOUND_TAG));
 
     private ModDataComponents() {
     }

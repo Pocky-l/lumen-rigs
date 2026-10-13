@@ -9,11 +9,13 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Cow;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -29,6 +31,7 @@ import com.pockyl.lumen_rigs.fixture.LightEffect;
 import com.pockyl.lumen_rigs.fixture.RedstoneMode;
 import com.pockyl.lumen_rigs.item.LightingRemoteItem;
 import com.pockyl.lumen_rigs.registry.ModBlocks;
+import com.pockyl.lumen_rigs.registry.ModDataComponents;
 import com.pockyl.lumen_rigs.registry.ModItems;
 
 /**
@@ -264,6 +267,40 @@ public final class ModGameTests {
         helper.assertTrue(FixtureSettings.load(new CompoundTag(), FixtureType.SOFT_PANEL).softness() == 1,
                 "a new panel is fully diffuse");
         helper.succeed();
+    }
+
+    @GameTest(template = "empty", batch = "brokenFixtureKeepsItsSettings")
+    public static void brokenFixtureKeepsItsSettings(GameTestHelper helper) {
+        FixtureBlockEntity fixture = place(helper, new BlockPos(1, 2, 1), ModBlocks.SPOTLIGHT.get().defaultBlockState());
+        fixture.applySettings(fixture.settings().withColor(0x3366FF).withBeam(20).withEffect(LightEffect.PULSE, 30));
+        fixture.aimAt(fixture.pivot().add(4, -2, 1));
+        ItemStack configured = breakAndPickUp(helper, new BlockPos(1, 2, 1));
+        helper.assertTrue(configured.is(ModItems.SPOTLIGHT.get()), "a broken spotlight drops itself");
+        helper.assertTrue(configured.has(ModDataComponents.SETTINGS.get()), "the dropped spotlight keeps its settings");
+
+        FixtureBlockEntity placed = place(helper, new BlockPos(3, 2, 1), ModBlocks.SPOTLIGHT.get().defaultBlockState());
+        placed.applyComponentsFromItemStack(configured);
+        FixtureSettings settings = placed.settings();
+        helper.assertTrue(settings.color() == 0x3366FF && settings.beam() == 20 && settings.effect() == LightEffect.PULSE,
+                "placed again, it shines as before");
+        helper.assertTrue(settings.mode() == AimMode.MANUAL, "a point aim comes back as a manual aim");
+
+        place(helper, new BlockPos(5, 2, 1), ModBlocks.SOFT_PANEL.get().defaultBlockState());
+        ItemStack plain = breakAndPickUp(helper, new BlockPos(5, 2, 1));
+        helper.assertTrue(plain.is(ModItems.SOFT_PANEL.get()) && !plain.has(ModDataComponents.SETTINGS.get()),
+                "an untouched fixture drops a plain item that stacks with crafted ones");
+        helper.succeed();
+    }
+
+    private static ItemStack breakAndPickUp(GameTestHelper helper, BlockPos relative) {
+        BlockPos pos = helper.absolutePos(relative);
+        helper.getLevel().destroyBlock(pos, true);
+        ItemStack found = ItemStack.EMPTY;
+        for (ItemEntity item : helper.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(pos).inflate(1))) {
+            found = item.getItem().copy();
+            item.discard();
+        }
+        return found;
     }
 
     private static FixtureBlockEntity place(GameTestHelper helper, BlockPos relative, BlockState state) {

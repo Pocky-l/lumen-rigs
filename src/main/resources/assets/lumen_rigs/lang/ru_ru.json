@@ -95,5 +95,8 @@
   "lumen_rigs.screen.effect.rainbow": "Радуга",
   "lumen_rigs.screen.effect.rainbow.hint": "Цвет проходит по всему цветовому кругу, начиная с цвета, выбранного ниже.",
   "lumen_rigs.screen.effect_speed": "В минуту: %s",
-  "lumen_rigs.screen.effect_speed.hint": "Сколько вспышек, пульсаций или циклов цвета в минуту. Приборы с одинаковым эффектом и скоростью работают синхронно."
+  "lumen_rigs.screen.effect_speed.hint": "Сколько вспышек, пульсаций или циклов цвета в минуту. Приборы с одинаковым эффектом и скоростью работают синхронно.",
+  "item.lumen_rigs.fixture.saved": "Сохранённые настройки",
+  "item.lumen_rigs.fixture.light": "Луч %s°, яркость %s",
+  "item.lumen_rigs.fixture.effect": "Эффект: %s"
 }
